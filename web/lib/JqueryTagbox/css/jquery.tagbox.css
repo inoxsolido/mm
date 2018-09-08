@@ -1,0 +1,43 @@
+.tagbox {
+	/*width: 250px;*/
+	height:initial;
+	padding: 10px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	/*float: none;*/
+	/*clear: both;*/
+	display:inline-block;
+	border: 1px solid black;
+	margin-bottom:10px;
+}
+.tagbox > input{
+	width:100%;
+}
+input.invisible-input{
+	border: none;
+	height:31px;
+	
+}
+input.invisible-input:focus{
+	border: none;
+	outline: none;
+}
+.tag {
+	float:left;
+	margin: 0px;
+	margin-right:5px;
+	padding: 5px;
+	background: #fff;
+	cursor: pointer;
+	border: 1px solid #e0e0e0;
+	border-radius: 3px;
+	box-shadow: 0 1px 0 white;
+	display: inline-block;
+}
+
+.tag::after {
+	content: "\2612";
+	float:right;
+	display: inline-block;
+	margin: -2px 0 0 10px;
+}
