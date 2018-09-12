@@ -74,8 +74,8 @@ use dmstr\widgets\Alert;
                     ['label' => 'Related Words', 'icon' => 'th-list', 'url' => "#"],
                     ['label' => 'Frequency Words', 'icon' => 'list-ol', 'url' => "#"],
                     ['label' => 'Dictionary', 'icon' => 'align-left', 'url' => ['dictionary/index']],
-                    ['label' => 'User', 'icon' => 'users', 'url' => ['user/index'], 'visible'=>Yii::$app->user->identity->getIsAdmin()],
-                    ['label' => 'Settings', 'icon' => 'cog', 'url' => ['/settings/index'], 'visible'=>Yii::$app->user->identity->getIsAdmin()],
+                    ['label' => 'User', 'icon' => 'users', 'url' => ['user/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
+                    ['label' => 'Settings', 'icon' => 'cog', 'url' => ['/settings/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
                 ],
             ]
         ) ?>
