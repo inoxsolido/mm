@@ -129,3 +129,8 @@ a.desc:after {
 .margin-center{margin: 0 auto;}
 
 .file-drop-zone{ height: inherit;}
+
+.sidebar-menu{
+    padding-top:10px;
+    background-color: #fff;
+}

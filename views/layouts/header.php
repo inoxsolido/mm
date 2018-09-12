@@ -17,7 +17,7 @@ $user = Yii::$app->user->identity or (!Yii::$app->user->isGuest);
                 
                 <?= Html::img("/img/LOGO230.png", ['width' => 230, 'height' => 50, 'class' => '', 'style' => 'min-width:230px !important; margin:0px; display:inline-block;']) ?>
             </a>
-            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                 <span class="sr-only">Toggle navigation</span>
             </a>
         </div>

@@ -25,7 +25,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             }
         </style>
     </head>
-    <body class="hold-transition skin-red-light sidebar-mini">
+    <body class="hold-transition skin-red-light sidebar-mini sidebar-collapse">
         <?php $this->beginBody()?>
         <div id="error-messages" class="alert alert-danger" style="opacity: 1; display: none"></div>
         <div id="success-messages" class="alert alert-success" style="opacity: 1; display: none"></div>
