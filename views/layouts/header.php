@@ -71,7 +71,7 @@ $user = Yii::$app->user->identity or (!Yii::$app->user->isGuest);
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a href="#" class="btn btn-default btn-flat">Change Profile</a>
+                                    <a href="<?= Url::to(['/user/update/', 'id'=>Yii::$app->user->getId()]) ?>" class="btn btn-default btn-flat">Change Profile</a>
                                 </div>
                                 <div class="pull-right">
                                     <?=Html::a('Sign out', ['/site/logout'], ['data-method' => 'post', 'class' => 'btn btn-default btn-flat'])?>

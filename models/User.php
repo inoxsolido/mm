@@ -24,6 +24,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
     public $image_file;
     public $password_confirm;
+    public $password_old;
 
     public static function tableName()
     {
@@ -42,6 +43,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['email', 'image_path'], 'string', 'max' => 255],
             [['username'], 'unique'],
             [['password_confirm', 'password'], 'required', 'on' => 'create'],
+            [['password_old'], 'required', 'on' => 'personal'],
+            [['password_old'], 'validateOldPassword', 'on' => 'personal'],
             ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match" ],
             [['user_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserType::className(), 'targetAttribute' => ['user_type_id' => 'id']],
         ];
@@ -57,13 +60,14 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'username' => 'ชื่อสำหรับลงชื่อเข้าใช้งาน',
             'password' => 'รหัสผ่านสำหรับเข้าระบบ',
             'password_confirm' => 'รหัสผ่านอีกครั้ง',
-            'email' => 'email ของผู้ใช้งาน',
+            'email' => 'Email ของผู้ใช้งาน',
             'name' => 'ชื่อจริงผู้ใช้งาน',
             'surname' => 'นามสกุลผู้ใช้งาน',
             'image_file' => 'รูปภาพผู้ใช้งาน',
             'image_path' => 'ตำแหน่งไฟล์ภาพ',
             'user_type_id' => 'ประเภทผู้ใช้งาน',
             'type'=>'ประเภทผู้ใช้งาน',
+            'password_old'=>'รหัสผ่านปัจจุบัน',
         ];
     }
 
@@ -170,4 +174,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return @$this->user_type_id === 1;
     }
 
+    public function validateOldPassword($attribute, $params)
+    {
+        if (Yii::$app->encryption->encryptUserPassword($this->password_old) !== $this->getOldAttribute('password')) {
+            $this->addError($attribute, 'Incorrect password.');
+        }
+    }
 }

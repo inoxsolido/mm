@@ -36,12 +36,23 @@ class UserController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'create',  'delete'],
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->identity->getIsAdmin();
                         }
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => ['update'],
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            if(Yii::$app->user->identity->getIsAdmin()) return true;
+                            if(Yii::$app->request->get('id') != Yii::$app->user->getId()) return false;
+                            return true;
+                        }
+                    ],
+                            
                 ],
             ]
         ];
@@ -72,6 +83,9 @@ class UserController extends Controller
     {
         $model = new User();
         $model->setScenario('create');
+        $selector = [];
+        $query = \app\models\UserType::find();
+        $selector = $query->all();
         if ($model->load(Yii::$app->request->post()))
         {
 
@@ -101,12 +115,14 @@ class UserController extends Controller
             }else{
                 return $this->render('create', [
                         'model' => $model,
+                        'selector' => $selector,
                 ]);
             }
         } else
         {
             return $this->render('create', [
                         'model' => $model,
+                        'selector' => $selector,
             ]);
         }
     }
@@ -120,7 +136,17 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        if(!Yii::$app->user->identity->getIsAdmin() && $id == Yii::$app->user->getId()){
+            $model->setScenario('personal');
+        }
+        $selector = [];
+        $query = \app\models\UserType::find();
+        $users = User::find()->where(['!=', 'id', Yii::$app->user->getId()])->andWhere(['user_type_id'=>1])->count();
+        /* @var $qadmin \app\models\UserType */
+        if($users === 0)
+            $query->where(['id'=>1]);
+            
+        $selector = $query->all();
         if ($model->load(Yii::$app->request->post()))
         {
             \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
@@ -134,31 +160,55 @@ class UserController extends Controller
             else
                 $model->password = $oldPassword;
             $model->password_confirm = $model->password;
+            
+            if(!Yii::$app->user->identity->getIsAdmin() && $id == Yii::$app->user->getId()){
+                $model->user_type_id = $model->getOldAttribute('user_type_id');
+            }
+            $validate = $model->validate();
             //check profile image change
             if ($model->image_file)
             {
                 $old_file = $model->image_path;
                 $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
-                if ($model->validate()){
+                if ($validate){
                     if(file_exists($old_file) && !@unlink($old_file)){
                         Yii::$app->getSession()->setFlash('error', 'Error while delete old profile image.'); 
                         return $this->render('update', [
                             'model' => $model,
+                            'selector'=>$selector,
                         ]);                       
                     }
                     $model->image_file->saveAs($model->image_path);
                 }
             }
-
-            $model->save();
-            Yii::$app->getSession()->setFlash(
-                    'success', 'User Changed'
-            );
-            return $this->redirect(['index']);
+            if($model->getOldAttribute('user_type_id') ==1 && 
+                    $model->user_type_id != 1 &&
+                    User::find()->where(['!=', 'id', $model->id])->andWhere(['user_type_id'=>1])->count() == 0
+                    ){
+                Yii::$app->getSession()->setFlash('error', 'Require at least 1 account as administrator.'); 
+                return $this->render('update', [
+                    'model' => $model,
+                    'selector'=>$selector,
+                ]); 
+            }
+            if($validate){
+                $model->save();
+                Yii::$app->getSession()->setFlash(
+                        'success', 'User Changed'
+                );
+                return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+            }
+            else{
+                return $this->render('update', [
+                        'model' => $model,
+                        'selector'=>$selector,
+                ]);
+            }
         } else
         {
             return $this->render('update', [
                         'model' => $model,
+                        'selector'=>$selector,
             ]);
         }
     }
@@ -172,6 +222,11 @@ class UserController extends Controller
     public function actionDelete($id)
     {
         $user = $this->findModel($id);
+        if($user->user_type_id ==1 && 
+            User::find()->where(['!=', 'id', $user->id])->andWhere(['user_type_id'=>1])->count() == 0){
+            Yii::$app->getSession()->setFlash('error', 'Require at least 1 account as administrator.'); 
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
         $file_path = $user->image_path;
         if(file_exists($file_path) && !@unlink($file_path)){
             Yii::$app->getSession()->setFlash('error', 'Error while delete profile image.'); 

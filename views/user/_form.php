@@ -13,7 +13,10 @@ use kartik\file\FileInput;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord]) ?>
-
+    <?php if($model->getScenario() === 'personal'): ?>
+    <?= $form->field($model, 'password_old')->passwordInput() ?>
+    <?php endif; ?>
+    
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'value'=>'']) ?>
     
     <?= $form->field($model, 'password_confirm')->passwordInput(['maxlength' => true]) ?>
@@ -46,9 +49,9 @@ use kartik\file\FileInput;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'surname')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'user_type_id')->dropDownList(yii\helpers\ArrayHelper::map(app\models\UserType::find()->all(), 'id', 'name')) ?>
-    
+    <?php if($model->getScenario() !== 'personal'): ?>
+    <?= $form->field($model, 'user_type_id')->dropDownList(yii\helpers\ArrayHelper::map($selector, 'id', 'name')) ?>
+    <?php endif; ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
