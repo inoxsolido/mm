@@ -71,12 +71,11 @@ use dmstr\widgets\Alert;
                     ['label' => 'Managements', 'options' => ['class' => 'header']],
                     ['label' => 'Media', 'icon' => 'film', 'url' => ['media/index']],
                     ['label' => 'Album', 'icon' => 'folder-o', 'url' => "#"],
-                    ['label' => 'Type of Media', 'icon' => 'file-o', 'url' => "media-type/index"],
                     ['label' => 'Related Words', 'icon' => 'th-list', 'url' => "#"],
                     ['label' => 'Frequency Words', 'icon' => 'list-ol', 'url' => "#"],
                     ['label' => 'Dictionary', 'icon' => 'align-left', 'url' => ['dictionary/index']],
-                    ['label' => 'User', 'icon' => 'users', 'url' => ['user/index']],
-                    ['label' => 'Settings', 'icon' => 'cog', 'url' => ['/settings/index']],
+                    ['label' => 'User', 'icon' => 'users', 'url' => ['user/index'], 'visible'=>Yii::$app->user->identity->getIsAdmin()],
+                    ['label' => 'Settings', 'icon' => 'cog', 'url' => ['/settings/index'], 'visible'=>Yii::$app->user->identity->getIsAdmin()],
                 ],
             ]
         ) ?>
