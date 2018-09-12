@@ -8,6 +8,7 @@ use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 
 /**
@@ -28,6 +29,21 @@ class UserController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'only' => ['index' ,'create', 'update', 'delete'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'create', 'update', 'delete'],
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->identity->getIsAdmin();
+                        }
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -46,17 +62,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single User model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-                    'model' => $this->findModel($id),
-        ]);
-    }
 
     /**
      * Creates a new User model.
