@@ -13,7 +13,9 @@ class EncryptionComponent extends Component
      */
     public function encryptUserPassword($password)
     {
-        return hash('md5', 'tgde'.$password.'tdge');
+        if($password == '') return '';
+        else
+            return hash('md5', 'tgde'.$password.'tdge');
     }
     
     public function encryptFtpPassword($password)
