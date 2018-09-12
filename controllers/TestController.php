@@ -19,6 +19,9 @@ use \yii\web\UploadedFile;
  */
 class TestController extends Controller
 {
+    public function actionIdentity(){
+        Yii::$app->utility->debug(Yii::$app->user->identity->getIsAdmin(),true);
+    }
     public function actionRelate(){
         $model = new Media;
         $model->media_type_id = 5;
