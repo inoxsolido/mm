@@ -159,6 +159,15 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return $this->hasOne(UserType::className(), ['id' => 'user_type_id']);
     }
-    
+    /* 
+     * check this user is admin
+     * this function can call from Yii::$app->user->identity->getIsAdmin();
+     * 
+     * return boolean
+     * 
+     */
+    public function getIsAdmin(){
+        return @$this->user_type_id === 1;
+    }
 
 }
