@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
+
 /**
  * UserController implements the CRUD actions for User model.
  */
@@ -75,6 +76,9 @@ class UserController extends Controller
             if ($model->image_file)
             {
                 $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
+                while(file_exists($model->image_path)){
+                    $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
+                }
                 if ($model->validate())
                     $model->image_file->saveAs($model->image_path);
             }
@@ -108,19 +112,26 @@ class UserController extends Controller
         {
             \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
             $model->image_file = \yii\web\UploadedFile::getInstance($model, 'image_file');
-
             //check password change
             $oldPassword = $model->getOldAttribute('password');
             if ("" == Yii::$app->encryption->encryptUserPassword($model->password))
             {
                 $model->password = $oldPassword;
             }
-
+            //check profile image change
             if ($model->image_file)
             {
+                $old_file = $model->image_path;
                 $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
-                if ($model->validate())
+                if ($model->validate()){
+                    if(file_exists($old_file) && !@unlink($old_file)){
+                        Yii::$app->getSession()->setFlash('error', 'Error while delete old profile image.'); 
+                        return $this->render('update', [
+                            'model' => $model,
+                        ]);                       
+                    }
                     $model->image_file->saveAs($model->image_path);
+                }
             }
 
             $model->save();
@@ -144,7 +155,14 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $user = $this->findModel($id);
+        $file_path = $user->image_path;
+        if(file_exists($file_path) && !@unlink($file_path)){
+            Yii::$app->getSession()->setFlash('error', 'Error while delete profile image.'); 
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+        
+        $user->delete();
         Yii::$app->getSession()->setFlash(
                 'success', 'User Deleted'
         );
