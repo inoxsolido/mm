@@ -77,7 +77,10 @@ class UserController extends Controller
 
             \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
             $model->image_file = \yii\web\UploadedFile::getInstance($model, 'image_file');
-
+            
+            $model->password = Yii::$app->encryption->encryptUserPassword($model->password);
+            $model->password_confirm = Yii::$app->encryption->encryptUserPassword($model->password_confirm);
+            
             if ($model->image_file)
             {
                 $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
@@ -89,12 +92,17 @@ class UserController extends Controller
             }
 
 
-
-            $model->save();
-            Yii::$app->getSession()->setFlash(
-                    'success', 'User Created'
-            );
-            return $this->redirect(['index']);
+            if ($model->validate()){
+                $model->save();
+                Yii::$app->getSession()->setFlash(
+                        'success', 'User Created'
+                );
+                return $this->redirect(['index']);
+            }else{
+                return $this->render('create', [
+                        'model' => $model,
+                ]);
+            }
         } else
         {
             return $this->render('create', [
@@ -118,11 +126,14 @@ class UserController extends Controller
             \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
             $model->image_file = \yii\web\UploadedFile::getInstance($model, 'image_file');
             //check password change
+            $encrypedPassword = Yii::$app->encryption->encryptUserPassword($model->password);
             $oldPassword = $model->getOldAttribute('password');
-            if ("" == Yii::$app->encryption->encryptUserPassword($model->password))
-            {
+            $oldEncrytedPassword = Yii::$app->encryption->encryptUserPassword($oldPassword);
+            if ($model->password != "" && $oldEncrytedPassword != $encrypedPassword)
+                $model->password = $encrypedPassword;
+            else
                 $model->password = $oldPassword;
-            }
+            $model->password_confirm = $model->password;
             //check profile image change
             if ($model->image_file)
             {
