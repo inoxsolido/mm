@@ -134,3 +134,11 @@ a.desc:after {
     padding-top:10px;
     background-color: #fff;
 }
+@media (min-width: 768px){
+.sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>a>span {
+    top: 0;
+    margin-left: -3px;
+    padding: 12px 5px 12px 0px;
+    background-color: inherit;
+}
+}

@@ -4,9 +4,9 @@ use yii\helpers\Html;
 use yii\bootstrap\Alert;
 /* @var $this \yii\web\View */
 /* @var $content string */
-
-app\assets\AppAsset::register($this);
 dmstr\web\AdminLteAsset::register($this);
+app\assets\AppAsset::register($this);
+
 
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
