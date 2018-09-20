@@ -209,7 +209,7 @@ class MediaSearch extends Media {
      *
      * @return ActiveDataProvider
      */
-    public function dataSearch($params) {
+    public function filter($params) {
         $query = Media::find();
 
         // add conditions that should always apply here
@@ -229,12 +229,17 @@ class MediaSearch extends Media {
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'file_upload_date' => $this->file_upload_date,
+//            'file_upload_date' => $this->file_upload_date,
             'is_public' => $this->is_public,
             'media_type_id' => $this->media_type_id,
             'album_id' => $this->album_id,
         ]);
-
+        
+        if(@$params['dr']!=""){
+            $date_range = explode(' - ', $params['dr']);
+            $query->andWhere(['BETWEEN', 'file_upload_date', $date_range[0], $date_range[1]]);
+        }
+        
         $query->andFilterWhere(['like', 'name', $this->name])
                 ->andFilterWhere(['like', 'file_name', $this->file_name])
                 ->andFilterWhere(['like', 'file_extension', $this->file_extension])
