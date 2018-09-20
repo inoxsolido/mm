@@ -29,7 +29,7 @@ class SearchController extends Controller {
         $oAlbum = Yii::$app->request->get("oAlbum");
         
         /* @var $setting \app\models\Settings */
-        $setting = (new Settings())->getModel();
+        $setting = Settings::getSetting();
 
         $mediaType = MediaType::find()->all();
         $selectionMediaType = \yii\helpers\ArrayHelper::map($mediaType, 'name', 'id');
@@ -68,7 +68,7 @@ class SearchController extends Controller {
          */
         $params = Yii::$app->request->post();
         $q = Yii::$app->request->post('q');
-        $setting = (new Settings())->getModel();
+        $setting = Settings::getSetting();
         if ($q != "") {
             $freg_relation_rate = $setting->frequency_relation_rate;
             $related_word = [];

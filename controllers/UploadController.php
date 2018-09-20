@@ -34,7 +34,7 @@ class UploadController extends Controller{
                 return "Number of thumbnails mismatch with a number of files.";
             }
             
-            $setting = \app\models\Settings::find()->one();
+            $setting = \app\models\Settings::getSetting();
             $ftp;//declare for exception catching
             $writen_filename = [];
             $transaction = Yii::$app->db->beginTransaction();
@@ -147,7 +147,7 @@ class UploadController extends Controller{
             $fileType = \app\models\MediaType::findOne(Yii::$app->request->post('type'));
             if (!$fileType){ Yii::$app->response->statusCode = 500; return "Parameter is missing."; }
             try{
-                $setting = \app\models\Settings::find()->one();
+                $setting = \app\models\Settings::getSetting();
                 $ftp = new \app\components\FtpClient();
                 $ftp->connect($setting->ftp_host);
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
@@ -249,7 +249,7 @@ class UploadController extends Controller{
             $model->thumbnail_file = UploadedFile::getInstance($model, 'thumbnail_file');
             
             try{
-                $setting = \app\models\Settings::find()->one();
+                $setting = \app\models\Settings::getSetting();
                 $ftp = new \app\components\FtpClient();
                 $ftp->connect($setting->ftp_host);
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());

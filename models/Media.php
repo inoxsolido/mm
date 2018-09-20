@@ -117,12 +117,12 @@ class Media extends \yii\db\ActiveRecord
     }
 
     public function getHttpPath($setting=''){
-        if(!$setting) $setting = Settings::findOne(1);
+        if(!$setting) $setting = Settings::getSetting();
         return 'http://'.$setting->ftp_host.$setting->http_part.'/'.$this->file_path.'/'.$this->file_name.$this->file_extension;
     }
 
     public function getFtpPath($setting=''){
-        if(!$setting) $setting = Settings::findOne(1);
+        if(!$setting) $setting = Settings::getSetting();
         return $setting->ftp_part.$this->file_path.'/'.$this->file_name.$this->file_extension;
     }
 
@@ -182,13 +182,67 @@ class Media extends \yii\db\ActiveRecord
     }
 
     public function getThumbnailHttpPath($setting=''){
-        if(!$setting) $setting = Settings::findOne(1);
+        if(!$setting) $setting = Settings::getSetting();
         return 'http://'.$setting->ftp_host.$setting->http_part.'/'.$this->file_thumbnail_path;
     }
 
     public function getThumbnailFtpPath($setting=''){
-        if(!$setting) $setting = Settings::findOne(1);
+        if(!$setting) $setting = Settings::getSetting();
         return $setting->ftp_part.$this->file_thumbnail_path;
+    }
+    
+    /**
+     * Deletes the table row corresponding to this active record.
+     *
+     * This method performs the following steps in order:
+     *
+     * 1. call [[beforeDelete()]]. If the method returns `false`, it will skip the
+     *    rest of the steps;
+     * 2. delete the record from the database;
+     * 3. call [[afterDelete()]].
+     *
+     * In the above step 1 and 3, events named [[EVENT_BEFORE_DELETE]] and [[EVENT_AFTER_DELETE]]
+     * will be raised by the corresponding methods.
+     *
+     * @return int|false the number of rows deleted, or `false` if the deletion is unsuccessful for some reason.
+     * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
+     * @throws StaleObjectException if [[optimisticLock|optimistic locking]] is enabled and the data
+     * being deleted is outdated.
+     * @throws \Exception|\Throwable in case delete failed.
+     */
+    //not complete
+    public function delete()
+    {
+        if (!$this->isTransactional(self::OP_DELETE)) {
+            return $this->deleteInternal();
+        }
+        $transaction = static::getDb()->beginTransaction();
+        try {
+            $ftp = new \app\components\FtpClient();
+            $ftp->connect($setting->ftp_host);
+            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+            $ftp->pasv(true);
+            $result = $this->deleteInternal();
+            if ($result === false) {
+                $transaction->rollBack();
+            } else {
+                $transaction->commit();
+            }
+            return $result;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
+    //not complete
+    public static function deleteAll($condition = null, $params = [])
+    {
+        $command = static::getDb()->createCommand();
+        $command->delete(static::tableName(), $condition, $params);
+        return $command->execute();
     }
 
 

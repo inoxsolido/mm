@@ -46,7 +46,7 @@ class MediaController extends Controller
     public function actionIndex()
     {
         $searchModel = new MediaSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->filter(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -69,7 +69,7 @@ class MediaController extends Controller
                 }
 
                 $media = $album->getMedia()->all();
-                $setting = Settings::find()->one();
+                $setting = Settings::getSetting();
                 $transaction = Yii::$app->db->beginTransaction();
 
                 try {
@@ -121,7 +121,7 @@ class MediaController extends Controller
                 }
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-                    $setting = Settings::find()->one();
+                    $setting = Settings::getSetting();
                     $ftp = new \app\components\FtpClient();
                     $ftp->connect($setting->ftp_host);
                     $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
@@ -186,7 +186,7 @@ class MediaController extends Controller
                 $media_set = Yii::$app->request->post("media_set");
                 $album_data = Yii::$app->request->post("album_data");
                 /* @var $setting \app\models\Settings */
-                $setting = \app\models\Settings::find()->one();
+                $setting = \app\models\Settings::getSetting();
                 $ftp = new \app\components\FtpClient();
 
                 if($album_data){//update Album Data
@@ -215,7 +215,7 @@ class MediaController extends Controller
                                 Yii::$app->response->statusCode = 405;
                                 return "ไม่สามารถเปลี่ยนชื่ออัลบั้มภายใน FTP Server ได้";
                             }else
-                                $ftp->close();
+                                $ftp->close()  ;
                         }
                     }
                     $album->tags = $album_data['tags'];
@@ -337,7 +337,7 @@ class MediaController extends Controller
         } else {
             if (Yii::$app->request->isPost) {
                 $model->load(Yii::$app->request->post());
-                $setting = \app\models\Settings::find()->one();
+                $setting = \app\models\Settings::getSetting();
                 $old_file_path_full = $model->getFtpPath($setting);
                 $old_file_thumbnail_path_full = $model->getThumbnailFtpPath($setting);
                 $isNameChanged = $model->isAttributeChanged('name');
@@ -419,16 +419,46 @@ class MediaController extends Controller
         }
     }
 
-    public function actionList(){
-        $searchModel = new MediaSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    //not complete
+    public function actionDelete($id){
+        $media = $this->findModel($id);
+        //backup file path and thumbnail path
+        $name = $media->name;
+        try{
+            $ftp = new \app\components\FtpClient();
+            $ftp->connect($setting->ftp_host);
+            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+            $ftp->pasv(true);
+        } catch (Exception $ex) {
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        }
+        if($media->delete()){
+            Yii::$app->getSession()->setFlash(
+                    'success', "$name deleted"
+            );
+        }
+        return $this->redirect(['index']);
     }
-
+    
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null)
+        {
+            return $model;
+        }
+        else
+        {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+    
     private function actionDummy(){
         if(Yii::$app->request->isPost){
             if(Yii::$app->user->isGuest !== true){

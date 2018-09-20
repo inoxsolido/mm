@@ -76,4 +76,14 @@ class Settings extends \yii\db\ActiveRecord
             return NULL;
         }
     }
+    
+    static function getSetting(){
+        $model = self::find()->one();
+        if($model)
+            return $model;
+        else{
+            throw new \yii\web\ServerErrorHttpException("The server was not set up.");
+            return NULL;
+        }
+    }
 }

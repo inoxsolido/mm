@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            
 
             'name',
             [
@@ -35,9 +35,29 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'mediaType.name'
             ],
             [
+                'attribute' => 'file_upload_date',
+                'value' => function($model){ return Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i');},
+                'format' => 'html',
+                'filter' => kartik\daterange\DateRangePicker::widget([
+                        'name'=>'dr',
+                        'hideInput'=>true,
+                        'convertFormat'=>true,
+                        'pluginOptions'=>[
+     
+                            'timePicker'=>true,
+                            "timePicker24Hour"=> true,
+                            'timePickerIncrement'=>1,
+                            'locale'=>['format'=>'Y-m-d H:i:s'],
+                        ],
+                        'pluginEvents'=>[
+                            'cancel.daterangepicker' => 'function() { $("[name=dr]").val(""); $("[name=dr]").parent().find(".range-value").text(""); }',
+                        ]
+                    ]),
+            ],
+            [
                 'header' => 'สิทธิ์เข้าถึง',
                 'attribute' => 'is_public',
-                'value' => function($data){return $data->is_public?"Public":"Private";},
+                'value' => function($data){return @$data['is_public']==0?'Private': 'Public';},
                 'filter' => [0=>'Private',1=>'Public'],
                 'format' => 'text',
             ],

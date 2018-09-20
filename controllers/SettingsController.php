@@ -82,7 +82,7 @@ class SettingsController extends Controller
      */
     public function actionIndex()
     {
-        $model = Settings::find()->one();
+        $model = Settings::getSetting();
         if(!$model) throw new \yii\base\UserException("Settings table is empty");
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->getSession()->setFlash(

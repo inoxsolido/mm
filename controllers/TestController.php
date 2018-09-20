@@ -19,6 +19,9 @@ use \yii\web\UploadedFile;
  */
 class TestController extends Controller
 {
+    public function actionStatic(){
+        Yii::$app->utility->debug(\app\models\Settings::getSetting(), true);
+    }
     public function actionIdentity(){
         Yii::$app->utility->debug(Yii::$app->user->identity->getIsAdmin(),true);
     }
