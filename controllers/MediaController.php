@@ -65,7 +65,7 @@ class MediaController extends Controller
                 if (!$album) {
                     Yii::$app->response->statusCode = 400;
                     Yii::$app->response->statusText = "Album Id is missing!.";
-                    return Yii::$app->response->send();
+                    return 'Album Id is missing!.';
                 }
 
                 $media = $album->getMedia()->all();
@@ -73,22 +73,24 @@ class MediaController extends Controller
                 $transaction = Yii::$app->db->beginTransaction();
 
                 try {
-                    $ftp = new \app\components\FtpClient();
-                    $ftp->connect($setting->ftp_host);
-                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-                    $ftp->pasv(true);
+//                    $ftp = new \app\components\FtpClient();
+//                    $ftp->connect($setting->ftp_host);
+//                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+//                    $ftp->pasv(true);
 
                     if($media){
                         $directory = dirname($media[0]->getFtpPath($setting));
 
-                        foreach ($media as $m) {
-                            /* @var $m Media */
-                            $file_path = $m->getFtpPath($setting);
-                            if (!$ftp->delete($file_path)) {
-                                throw new Exception("Ftp delete Error");
-                            }
-                            $m->delete($file_path);
-                        }
+                        Media::deleteAll(['album_id'=>$album_id]);
+                        
+//                        foreach ($media as $m) {
+//                            /* @var $m Media */
+//                            $file_path = $m->getFtpPath($setting);
+//                            if (!$ftp->delete($file_path)) {
+//                                throw new Exception("Ftp delete Error");
+//                            }
+//                            $m->delete($file_path);
+//                        }
                         if (!$ftp->remove($directory))
                             throw new Exception("Ftp remove Error");
                     }
@@ -102,12 +104,12 @@ class MediaController extends Controller
 
 
             }else{
-                Yii::$app->response->statusCode = 401;
-                return Yii::$app->response->send();
+                Yii::$app->response->setStatusCode(401);
+                return Yii::$app->response->statusText;
             }
         } else {
-            Yii::$app->response->statusCode = 405;
-            return Yii::$app->response->send();
+            Yii::$app->response->setStatusCode(405);
+            return Yii::$app->response->statusText;
         }
     }
 
@@ -116,45 +118,44 @@ class MediaController extends Controller
             if(Yii::$app->user->isGuest !== true){
                 $media_id_set = Yii::$app->request->post("media_id_set");
                 if(Empty($media_id_set)){
-                    Yii::$app->response->statusCode = 405;
-                    return Yii::$app->response->send();
+                    Yii::$app->response->statusCode = 400;
+                    return 'Media set is missing!.';
                 }
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-                    $setting = Settings::getSetting();
-                    $ftp = new \app\components\FtpClient();
-                    $ftp->connect($setting->ftp_host);
-                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-                    $ftp->pasv(true);
+//                    $setting = Settings::getSetting();
+//                    $ftp = new \app\components\FtpClient();
+//                    $ftp->connect($setting->ftp_host);
+//                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+//                    $ftp->pasv(true);
 
-                    $media = Media::find()->where(['id'=>$media_id_set])->all();
-
-
-                    foreach ($media as $m) {
-                        /* @var $m Media */
-                        $file_path = $m->getFtpPath($setting);
-                        if($ftp->delete($file_path)){
-                            $m->delete();
-                        }
-                    }
+                    Media::deleteAll(['id' => $media_id_set]);
+//                    $media = Media::find()->where(['id'=>$media_id_set])->all();
+//                    foreach ($media as $m) {
+//                        /* @var $m Media */
+//                        $file_path = $m->getFtpPath($setting);
+//                        if($ftp->delete($file_path)){
+//                            $m->delete();
+//                        }
+//                    }
                     $transaction->commit();
                     Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
                 }catch(Exception $e){
                     $transaction->rollBack();
                     Yii::$app->response->statusCode = 500;
                     Yii::$app->response->statusText = $e->getMessage();
-                    return Yii::$app->response->send();
+                    return Yii::$app->response->statusText;
                 }
             }else{
-                Yii::$app->response->statusCode = 401;
-                return Yii::$app->response->send();
+                Yii::$app->response->setStatusCode(401);
+                return Yii::$app->response->statusText;
             }
         }else{
-            Yii::$app->response->statusCode = 405;
-            return Yii::$app->response->send();
+            Yii::$app->response->setStatusCode(405);
+            return Yii::$app->response->statusText;
         }
     }
-
+    //display form
     public function actionAlbumEdit($id = '')
     {
         //Set default $album_id
@@ -192,7 +193,7 @@ class MediaController extends Controller
                 if($album_data){//update Album Data
                     $album = Album::findOne($album_data['id']);
                     if(!$album){//Incorrect Album Id
-                        Yii::$app->response->statusCode = 405;
+                        Yii::$app->response->statusCode = 400;
                         return "Incorrect Album Id";
                     }
                     //Change Album Name
@@ -200,7 +201,7 @@ class MediaController extends Controller
                         //Check duplicate new name with old albums
                         $album->name = $album_data['name'];
                         if(!$album->validate(['name'])){ // new name is duplicated
-                            Yii::$app->reponse->statusCode = 405;
+                            Yii::$app->reponse->statusCode = 400;
                             return "Album name is exist";
                         }else{//Rename folder on FTP Server
                             $ftp->connect($setting->ftp_host);
@@ -212,7 +213,7 @@ class MediaController extends Controller
 
                             if(!$ftp->rename($oldFolderName,$newFolderName)){//return if cant rename
                                 $ftp->close();
-                                Yii::$app->response->statusCode = 405;
+                                Yii::$app->response->statusCode = 500;
                                 return "ไม่สามารถเปลี่ยนชื่ออัลบั้มภายใน FTP Server ได้";
                             }else
                                 $ftp->close()  ;
@@ -281,21 +282,21 @@ class MediaController extends Controller
                             }
                             return "บันทึกข้อมูลสำเร็จ";
                         }else{
-                            Yii::$app->response->statusCode = 405;
+                            Yii::$app->response->setStatusCode(400);
                             return "Media Data is missing";
                         }
                     }
                 }else{
-                    Yii::$app->response->statusCode = 405;
+                    Yii::$app->response->setStatusCode(400);
                     return "Album Data is missing";
                 }
             }else{
-                Yii::$app->response->statusCode = 401;
-                return Yii::$app->response->send();
+                Yii::$app->response->setStatusCode(401);
+                return Yii::$app->response->statusText;
             }
         }else{
-            Yii::$app->response->statusCode = 405;
-            return Yii::$app->response->send();
+            Yii::$app->response->setStatusCode(405);
+            return Yii::$app->response->statusText;
         }
     }
 
@@ -309,16 +310,16 @@ class MediaController extends Controller
                     $album->name = $album_name;
                     return $album->validate(['name'])?'ok':'not';
                 }else{
-                    Yii::$app->response->statusCode = 405;
+                    Yii::$app->response->setStatusCode(400);
                     return "Incorrect album id";
                 }
             }else{
                 Yii::$app->response->statusCode = 401;
-                return Yii::$app->response->send();
+                return Yii::$app->response->statusText;
             }
         }else{
             Yii::$app->response->statusCode = 405;
-            return Yii::$app->response->send();
+            return Yii::$app->response->statusText;
         }
     }
 
@@ -423,15 +424,6 @@ class MediaController extends Controller
     public function actionDelete($id){
         $media = $this->findModel($id);
         //backup file path and thumbnail path
-        $name = $media->name;
-        try{
-            $ftp = new \app\components\FtpClient();
-            $ftp->connect($setting->ftp_host);
-            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-            $ftp->pasv(true);
-        } catch (Exception $ex) {
-
-        }
         if($media->delete()){
             Yii::$app->getSession()->setFlash(
                     'success', "$name deleted"

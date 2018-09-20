@@ -210,22 +210,33 @@ class Media extends \yii\db\ActiveRecord
      * being deleted is outdated.
      * @throws \Exception|\Throwable in case delete failed.
      */
-    //not complete
     public function delete()
     {
+        $setting = Settings::getSetting();
+        $ftp = new \app\components\FtpClient();
+        $ftp->connect($setting->ftp_host);
+        $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+        $ftp->pasv(true);
+        
+        $file_path = $this->getFtpPath($setting);
+        $thumbnail_path = $this->getThumbnailFtpPath($setting);
+        
         if (!$this->isTransactional(self::OP_DELETE)) {
-            return $this->deleteInternal();
+            $result = $this->deleteInternal();
+            if($result){
+                @$ftp->delete($file_path);
+                @$ftp->delete($thumbnail_path);
+            }
+            return $result;
         }
         $transaction = static::getDb()->beginTransaction();
         try {
-            $ftp = new \app\components\FtpClient();
-            $ftp->connect($setting->ftp_host);
-            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-            $ftp->pasv(true);
             $result = $this->deleteInternal();
             if ($result === false) {
                 $transaction->rollBack();
             } else {
+                @$ftp->delete($file_path);
+                @$ftp->delete($thumbnail_path);
                 $transaction->commit();
             }
             return $result;
@@ -242,7 +253,33 @@ class Media extends \yii\db\ActiveRecord
     {
         $command = static::getDb()->createCommand();
         $command->delete(static::tableName(), $condition, $params);
-        return $command->execute();
+        
+        $setting = Settings::getSetting();
+        $ftp = new \app\components\FtpClient();
+        $ftp->connect($setting->ftp_host);
+        $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+        $ftp->pasv(true);
+        
+        //get all media same condition to delete
+        $models = static::find()->where($condition, $params)->all();
+        
+        $result = $command->execute();
+        $file_paths = [];
+        $thumbnail_paths = [];
+        if($result){
+            foreach($models as $model){
+                $file_path[] = $model->getFtpPath($setting);
+                $thumbnail_paths[] = $model->getThumbnailFtpPath($setting);
+            }
+            foreach($file_path as $path){
+                @$ftp->delete($path);
+            }
+            foreach($thumbnail_paths as $t){
+                @$ftp->delete($path);
+            }
+        }
+        
+        return $result;
     }
 
 
