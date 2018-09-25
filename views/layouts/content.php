@@ -70,7 +70,7 @@ use dmstr\widgets\Alert;
                 'items' => [
                     ['label' => 'Managements', 'options' => ['class' => 'header']],
                     ['label' => 'Media', 'icon' => 'film', 'url' => ['media/index']],
-                    ['label' => 'Album', 'icon' => 'folder-o', 'url' => "#"],
+                    ['label' => 'Album', 'icon' => 'folder-o', 'url' => ['album/index']],
                     ['label' => 'Related Words', 'icon' => 'th-list', 'url' => "#"],
                     ['label' => 'Frequency Words', 'icon' => 'list-ol', 'url' => "#"],
                     ['label' => 'Dictionary', 'icon' => 'align-left', 'url' => ['dictionary/index']],
