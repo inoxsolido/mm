@@ -55,63 +55,6 @@ class MediaController extends Controller
     }
 
 
-    public function actionDeleteAlbum()
-    {
-        if (Yii::$app->request->isPost) {
-            if (Yii::$app->user->isGuest !== true) {
-                $album_id = Yii::$app->request->post("album_id");
-                $album = Album::findOne($album_id);
-
-                if (!$album) {
-                    Yii::$app->response->statusCode = 400;
-                    Yii::$app->response->statusText = "Album Id is missing!.";
-                    return 'Album Id is missing!.';
-                }
-
-                $media = $album->getMedia()->all();
-                $setting = Settings::getSetting();
-                $transaction = Yii::$app->db->beginTransaction();
-
-                try {
-//                    $ftp = new \app\components\FtpClient();
-//                    $ftp->connect($setting->ftp_host);
-//                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-//                    $ftp->pasv(true);
-
-                    if($media){
-                        $directory = dirname($media[0]->getFtpPath($setting));
-
-                        Media::deleteAll(['album_id'=>$album_id]);
-                        
-//                        foreach ($media as $m) {
-//                            /* @var $m Media */
-//                            $file_path = $m->getFtpPath($setting);
-//                            if (!$ftp->delete($file_path)) {
-//                                throw new Exception("Ftp delete Error");
-//                            }
-//                            $m->delete($file_path);
-//                        }
-                        if (!$ftp->remove($directory))
-                            throw new Exception("Ftp remove Error");
-                    }
-                    $album->delete();
-                    $transaction->commit();
-                } catch (Exception $ex) {
-                    $transaction->rollBack();
-                    Yii::$app->response->statusCode = 500;
-                    return $ex->getMessage();
-                }
-
-
-            }else{
-                Yii::$app->response->setStatusCode(401);
-                return Yii::$app->response->statusText;
-            }
-        } else {
-            Yii::$app->response->setStatusCode(405);
-            return Yii::$app->response->statusText;
-        }
-    }
 
     public function actionDeleteSelectedMedia(){
         if(Yii::$app->request->isPost){
@@ -175,7 +118,7 @@ class MediaController extends Controller
             $m_media = $m_album->getMedia()->orderBy(['file_upload_date' => SORT_ASC])->all();
         }
 
-        return $this->render("album-update-form", [
+        return $this->render("/album/album-update-form", [
             'album' => $m_album,
             'media' => $m_media
         ]);
