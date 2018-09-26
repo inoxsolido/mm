@@ -84,7 +84,7 @@ class Media extends \yii\db\ActiveRecord
             'file_name' => 'ชื่อไฟล์ที่เก็บใน Storage',
             'file_extension' => 'File Extension',
             'file_path' => 'ตำแหน่งไฟล์ใน Storage',
-            'file_upload_date' => 'File Upload Date',
+            'file_upload_date' => 'วันที่อัพโหลดไฟล์',
             'file_thumbnail_path' => 'ภาพตัวอย่าง',
             'tags' => 'Keyword สำคัญที่ใช้ค้นหา',
             'is_public' => 'Guest สามารถเข้าถึงได้',
