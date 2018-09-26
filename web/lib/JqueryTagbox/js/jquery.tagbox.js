@@ -1,3 +1,11 @@
+/**
+ * HTML TEMPLATE
+ * <div class="tagbox ">
+ *     <input class="invisible-input" type="text" name="tagbox" value="" />
+ * </div>
+ * 
+ */
+
 var tagbox = {};
 tagbox.resize_input;
 tagbox.delete_event = function (e) {
@@ -12,7 +20,7 @@ tagbox.delete_event = function (e) {
         $(input).attr("placeholder", "Tags (e.g., albert einstein, flying pig, mashup)");
     } else {
 
-        tagbox.resize_input();
+        tagbox.resize_input($input);
     }
 }
 tagbox.split_event = function (e) {
@@ -43,25 +51,29 @@ tagbox.create_tag_chip = function (container, tag) {
     $input.attr("placeholder", "");
 
 
-    tagbox.resize_input();
+    tagbox.resize_input($input);
 
 };
 tagbox.tagbox = function (selector) {
-    tagbox.resize_input = function () {
-        $input = $(selector).children("input");
+    tagbox.resize_input = function ($input) {
+        
         $chips = $input.siblings(".tag");
         chips_width = 0;
         parent_width = $input.parent().width();
         $chips.each(function () {
             chips_width += ($(this).outerWidth(true));
         });
+        
         new_width = parent_width - chips_width-20;
         if (new_width <= (30/100*parent_width))
             new_width = "100%";
         $input.width(new_width);
     }
     $(window).resize(function () {
-        tagbox.resize_input();
+        $(selector).each(function(){
+            tagbox.resize_input($(this));
+        });
+        
     });
     $(selector).click(function () {
         $(this).children("input").focus()
@@ -84,6 +96,7 @@ tagbox.tagbox = function (selector) {
     $(selector).each(function () {
         $input = $(this).children("input");
         $input.attr("placeholder", "Tags (e.g., albert einstein, flying pig, mashup)");
+        $input.width('100%');
         $input.init.prototype.tagvalue = function (newtags) {
             $this = $(this);
             if (!newtags) {//get
