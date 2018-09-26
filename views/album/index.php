@@ -19,11 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
             'name',
-            'tags:ntext',
+            [
+                'attribute' => 'tags',
+                'format' => 'ntext',
+                'enableSorting' => false,
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
