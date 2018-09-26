@@ -100,7 +100,7 @@ class UploadController extends Controller{
                     $writen_filename[] = $media->getThumbnailFtpPath($setting);
                 }
                 $transaction->commit();
-                return Url::to(['media/album-edit', 'id' => $album_id]);
+                return Url::to(['album/update', 'id' => $album_id]);
             } catch (\Exception $ex) {
                 $transaction->rollback();
                 if(!($ex instanceof \yii2mod\ftp\FtpException) && !empty($writen_filename)){
