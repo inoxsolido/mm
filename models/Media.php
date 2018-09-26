@@ -182,6 +182,10 @@ class Media extends \yii\db\ActiveRecord
     }
 
     public function getThumbnailHttpPath($setting=''){
+        if($this->file_thumbnail_path == ''){
+            //send path of default image by media type @not complete !!
+            return '';
+        }
         if(!$setting) $setting = Settings::getSetting();
         return 'http://'.$setting->ftp_host.$setting->http_part.'/'.$this->file_thumbnail_path;
     }
