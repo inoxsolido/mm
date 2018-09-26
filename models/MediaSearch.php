@@ -18,8 +18,8 @@ class MediaSearch extends Media {
      */
     public function rules() {
         return [
-            [['id', 'is_public', 'media_type_id', 'album_id'], 'integer'],
-            [['name', 'file_name', 'file_extension', 'file_path', 'file_upload_date', 'file_thumbnail_path', 'tags'], 'safe'],
+            [['id', 'is_public','media_type_id', ], 'integer'],
+            [['name',  'album_id', 'file_name', 'file_extension', 'file_path', 'file_upload_date', 'file_thumbnail_path', 'tags'], 'safe'],
         ];
     }
 
@@ -210,7 +210,9 @@ class MediaSearch extends Media {
      * @return ActiveDataProvider
      */
     public function filter($params) {
-        $query = Media::find();
+        $query = Media::find()
+                ->joinWith('album', true, 'LEFT JOIN')
+                ->joinWith('mediaType', true, 'LEFT JOIN');
 
         // add conditions that should always apply here
 
@@ -225,27 +227,30 @@ class MediaSearch extends Media {
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        $dataProvider->sort->attributes['album_name'] = [
+            'asc' => ['album.name' => SORT_ASC],
+            'desc' => ['album.name'=> SORT_DESC],
+        ];
+        
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
 //            'file_upload_date' => $this->file_upload_date,
             'is_public' => $this->is_public,
             'media_type_id' => $this->media_type_id,
-            'album_id' => $this->album_id,
+//            'album_id' => $this->album_id,
         ]);
         
         if(@$params['dr']!=""){
             $date_range = explode(' - ', $params['dr']);
             $query->andWhere(['BETWEEN', 'file_upload_date', $date_range[0], $date_range[1]]);
         }
-        
+        $splited_tag = explode(',', $this->tags);
+        foreach($splited_tag as $tag){
+            $query->andFilterWhere(['like', 'tags', $tag]);
+        }
         $query->andFilterWhere(['like', 'name', $this->name])
-                ->andFilterWhere(['like', 'file_name', $this->file_name])
-                ->andFilterWhere(['like', 'file_extension', $this->file_extension])
-                ->andFilterWhere(['like', 'file_path', $this->file_path])
-                ->andFilterWhere(['like', 'file_thumbnail_path', $this->file_thumbnail_path])
-                ->andFilterWhere(['like', 'tags', $this->tags]);
+                ->andFilterWhere(['like', 'album.name', $this->album_id]);
 
         return $dataProvider;
     }
