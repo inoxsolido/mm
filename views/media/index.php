@@ -19,6 +19,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             
+            [
+                'label' => 'ภาพตัวอย่าง',
+                'headerOptions' => ['style' => 'min-width:200px'],
+                'value' => function($model){
+                    
+                    return yii\helpers\Html::img($model->getThumbnailHttpPath(), ['style'=>['width'=>'200px']]);
+                },
+                'format' => 'html'
+            ],
 
             'name',
             [
@@ -32,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'media_type_id',
+                'filter'=> yii\helpers\ArrayHelper::map(\app\models\MediaType::find()->all(),'id','name'),
                 'value' => 'mediaType.name'
             ],
             [
@@ -55,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]),
             ],
             [
-                'header' => 'สิทธิ์เข้าถึง',
+                'label' => 'สิทธิ์เข้าถึง',
                 'attribute' => 'is_public',
                 'value' => function($data){return @$data['is_public']==0?'Private': 'Public';},
                 'filter' => [0=>'Private',1=>'Public'],
