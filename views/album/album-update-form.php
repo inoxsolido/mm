@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use richardfan\widget\JSRegister;
 
 \app\assets\JqueryTagboxAsset::register($this);
 /* @var $this yii\web\View */
@@ -70,7 +71,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
                 <button id="btnapplytag" class="btn btn-success">Use Album's tag</button><?php endif; ?></div>
         <div style='float:right'>
             <button id="media-delete" class="btn btn-warning">Delete Selected Media</button>
-            <button id="album-delete" class="btn btn-danger">Delete Album</button>
+            <a href='<?= Url::to(['album/delete', 'id'=>@$album->id])?>' id="album-delete" class="btn btn-danger" data-method='post' data-confirm="Are you sure you want to delete this item?"> Delete Album</a>
             <button id="album-save" class="btn btn-primary">Save</button>
         </div>
     </div>
@@ -79,10 +80,10 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
         <table class="table table-bordered ">
             <thead>
             <tr>
-                <th><input id="checkmainall" class="check-main-all" type="checkbox"/></th>
-                <th>Preview</th>
-                <th>Name</th>
-                <th>Tags</th>
+                <th style='min-width:10px'><input id="checkmainall" class="check-main-all" type="checkbox"/></th>
+                <th style='min-width:75px'>Preview</th>
+                <th style="width:35%">Name</th>
+                <th style="width:50%">Tags</th>
                 <th><input id="checkpuball" class="check-pub-all" type="checkbox"/> Public</th>
             </tr>
             </thead>
@@ -90,16 +91,16 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
             <?php foreach ($media as $m): ?>
                 <tr data-id="<?= $m->id; ?>">
                     <!--checkbox-->
-                    <td width="10"><input class="check-main" type="checkbox" value="<?= $m->id; ?>"/></td>
+                    <td><input class="check-main" type="checkbox" value="<?= $m->id; ?>"/></td>
                     <!--preview-->
-                    <td width="75"><img src="<?= $m->getHttpPath() ?>" width="50"></td
+                    <td><img src="<?= $m->getHttpPath() ?>" width="50"></td>
                     <!--name-->
-                    <td style="width:35%"><input value="<?= $m->name ?>" class="in-name form-control" required=""/></td>
+                    <td><input value="<?= $m->name ?>" class="in-name form-control" required=""/></td>
 
                     <!--tag-->
-                    <td style="width:50%">
+                    <td>
                         <div class="tagbox form-control">
-                            <input class="invisible-input add-tag in-tags" type="text" name="tagbox"
+                            <input class="invisible-input in-tags" type="text" name="tagbox" value='<?= $m->tags?>'
                                    placeholder="Tags (e.g., albert einstein, flying pig, mashup)"/>
                         </div>
                     </td>
@@ -115,14 +116,13 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
 </div>
 <script>
     var url={
-        album_delete: "<?= Url::to(['media/delete-album']) ?>",
-        album_save: "<?= Url::to(['media/update-album']) ?>",
+        album_save: "<?= Url::to(['album/update']) ?>",
         media_delete: "<?= Url::to(['media/delete-selected-media']) ?>",
-        check_album_name: "<?=Url::to(['media/check-album-name']) ?>"
+        check_album_name: "<?=Url::to(['album/check-album-name']) ?>"
     }
 </script>
-<?php
-$script = <<< JS
+<?php JSRegister::begin(['position'=> yii\web\View::POS_READY]); ?>
+<script>
 $(document).ready(function(){
     var csrfToken = $('meta[name="csrf-token"]').attr("content");
     
@@ -211,28 +211,7 @@ $(document).ready(function(){
         var state = $(".check-pub-all").is(":checked");
         $(".check-pub").prop({checked: state});
     });
-    
-    $("#album-delete").click(function(){
-        $.ajax({
-            url: url.album_delete,
-            type: "POST",
-            async: false,
-            data:{
-                album_id: $("#album-id").val(),
-                _csrf: csrfToken
-            }
-        }).done(function(data, textStatus, jqXHR){
-//            successPopUp("ลบข้อมูลสำเร็จ");
-            window.location.reload();
-        }).fail(function(jqXHR,textStatus,errorThrown){
-            if(jqXHR.status === 500){
-                errorPopUp(jqXHR.responseText);
-            }else{
-                errorPopUp(textStatus);
-            }
-        });
-        
-    });
+
     $("#media-delete").click(function(){
         var media_id_set,
         media_checked = $(".check-main:checked");
@@ -314,21 +293,10 @@ $(document).ready(function(){
         });
         
     });
-    
-    function errorPopUp(data){
-        $("#error-messages").prependTo(".content");
-        $('#error-messages').html(data).stop().fadeIn().animate({opacity: 1.0}, 4000).fadeOut('slow');
-    }
-    function successPopUp(data){
-        $("#success-messages").prependTo(".content");
-        $('#success-messages').html(data).stop().fadeIn().animate({opacity: 1.0}, 4000).fadeOut('slow');
-    }
-    
+   
     main();
 });
-    
-JS;
-$this->registerJs($script, \yii\web\View::POS_END);
+</script>
+<?php JSRegister::end(); ?>
 
-?>
 
