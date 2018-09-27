@@ -27,9 +27,11 @@ class FrequencyWord extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['word', 'frequency'], 'required'],
+            [['word'], 'required'],
             [['word'], 'string'],
+            [['word'], 'unique'],
             [['frequency'], 'integer'],
+            [['frequency'], 'default', 'value'=>1],
         ];
     }
 

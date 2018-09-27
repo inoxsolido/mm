@@ -28,9 +28,11 @@ class FrequencyRelation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['word1', 'word2', 'frequency'], 'required'],
+            [['word1', 'word2'], 'required'],
             [['word1', 'word2'], 'string'],
+            [['word1', 'word2'], 'doubleUnique'],
             [['frequency'], 'integer'],
+            [['frequency'], 'default', 'value'=>1],
         ];
     }
 
@@ -45,5 +47,17 @@ class FrequencyRelation extends \yii\db\ActiveRecord
             'word2' => 'คำค้นถัดไป',
             'frequency' => 'ความถี่',
         ];
+    }
+    
+    public function doubleUnique($attribute, $params, $validator){
+        if(self::find()
+                ->orWhere(['and',['word1'=>$this->word1], ['word2'=>$this->word2]])
+                ->orWhere(['and',['word1'=>$this->word2], ['word2'=>$this->word1]])
+                ->andWhere(['not',['id'=>$this->id]])->exists()){
+            $this->addError('word1',"$this->word1 and $this->word2 is exist!");
+            $this->addError('word2',"$this->word1 and $this->word2 is exist!");
+            return false;
+        }
+        return true;
     }
 }
