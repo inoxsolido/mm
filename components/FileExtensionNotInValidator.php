@@ -16,7 +16,7 @@ use yii\web\UploadedFile;
  *
  * @author Bravo
  */
-class MyFileValidator extends \yii\validators\FileValidator{
+class FileExtensionNotInValidator extends \yii\validators\FileValidator{
     
     
     protected function validateValue($value)
