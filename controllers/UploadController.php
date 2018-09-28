@@ -130,7 +130,7 @@ class UploadController extends Controller{
     
     public function actionVideo(){
         $model = new Media();
-        $model->scenario = 'create';
+        $model->scenario = 'video';
         if(Yii::$app->request->isAjax && Yii::$app->request->post('ajax') === 'w0'){
             $model->load(Yii::$app->request->post());
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

@@ -58,15 +58,11 @@ class Media extends \yii\db\ActiveRecord
             [['name', 'file_name'], 'string', 'max' => 255],
             [['file_extension'], 'string', 'max' => 10],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
-            [['media_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => MediaType::className(), 'targetAttribute' => ['media_type_id' => 'id']],
-            [['thumbnail_file'], 'file', 'extensions'=> (new MediaType())->getExtensionAsString('image')],
-            [['media_file'], 'file', 'extensions'=>(new MediaType())->getExtensionAsString('video'), 'on'=>'video'],
-            [['media_file'], \app\components\MyFileValidator::className(), 'extensions'=>(new MediaType())->getExtensionAsString(['video', 'image']), 'on'=>'other'],
+            [['media_type_id'], 'exist', 'skipOnError' => false, 'targetClass' => MediaType::className(), 'targetAttribute' => ['media_type_id' => 'id']],
+            [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')],
+            [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'],
+            [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'],
             [['media_file'], 'required', 'on'=>['create','video','other']],
-//            [['thumbnail_file'], 'required', 'when' => function(){
-//                if($this->thumbnail_from_video == '') return true;
-//                else return false;
-//            },],
             [['thumbnail_file'], \app\components\RequiredWhenOneEmptyValidator::className(), 'emptyAttribute'=>'thumbnail_from_video', 'on'=>'video'],
             [['thumbnail_file'], 'required', 'on'=>'other'],
         ];
