@@ -13,7 +13,7 @@ class RequiredWhenOneEmptyValidator extends Validator
     public function init()
     {
         parent::init();
-        $this->message = 'cannot be blank.';
+        $this->message = 'cannot be blank.555';
     }
 
 //    public function validateAttribute($model, $attribute)
@@ -32,7 +32,7 @@ class RequiredWhenOneEmptyValidator extends Validator
         return <<<JS
             
             if ( value == '' && $("#thumbnail_from_video").val() == "" ) {
-                messages.push(attribute"$this->message");
+                messages.push('$attribute '+"$this->message");
             }
 JS;
     }
