@@ -54,51 +54,6 @@ class MediaController extends Controller
         ]);
     }
 
-
-
-    public function actionDeleteSelectedMedia(){
-        if(Yii::$app->request->isPost){
-            if(Yii::$app->user->isGuest !== true){
-                $media_id_set = Yii::$app->request->post("media_id_set");
-                if(Empty($media_id_set)){
-                    Yii::$app->response->statusCode = 400;
-                    return 'Media set is missing!.';
-                }
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-//                    $setting = Settings::getSetting();
-//                    $ftp = new \app\components\FtpClient();
-//                    $ftp->connect($setting->ftp_host);
-//                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-//                    $ftp->pasv(true);
-
-                    Media::deleteAll(['id' => $media_id_set]);
-//                    $media = Media::find()->where(['id'=>$media_id_set])->all();
-//                    foreach ($media as $m) {
-//                        /* @var $m Media */
-//                        $file_path = $m->getFtpPath($setting);
-//                        if($ftp->delete($file_path)){
-//                            $m->delete();
-//                        }
-//                    }
-                    $transaction->commit();
-                    Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
-                }catch(Exception $e){
-                    $transaction->rollBack();
-                    Yii::$app->response->statusCode = 500;
-                    Yii::$app->response->statusText = $e->getMessage();
-                    return Yii::$app->response->statusText;
-                }
-            }else{
-                Yii::$app->response->setStatusCode(401);
-                return Yii::$app->response->statusText;
-            }
-        }else{
-            Yii::$app->response->setStatusCode(405);
-            return Yii::$app->response->statusText;
-        }
-    }
-
     public function actionMediaEdit($id) {
         //Set default $media->id
         if ($id === '')

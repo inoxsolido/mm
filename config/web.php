@@ -55,12 +55,13 @@ $config = [
             'enableStrictParsing' => false,
             
             'rules' => [
-                
+                'upload/image/<album:(new|exist)>' => 'upload/image',
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
                 '<controller:\w+>/<action:[a-zA-Z\-]+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:[a-zA-Z\-]+>' => '<controller>/<action>',
                 '<controller:search>' => '<controller>/index/',
                 '<action:\w+>' => 'site/<action>',
+                
                 
             ],
         ],

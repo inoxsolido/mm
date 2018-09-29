@@ -16,7 +16,7 @@ use dmstr\widgets\Alert;
     <section class="content-header">
         <?php if (isset($this->blocks['content-header']))
         {?>
-            <h1><?=$this->blocks['content-header']?></h1>
+<!--            <h1><?=$this->blocks['content-header']?></h1>-->
             <?php }
             else
             {?>

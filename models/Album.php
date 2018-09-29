@@ -30,14 +30,11 @@ class Album extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['name'], 'required'],
             [['tags'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique',
-//                'filter' => function ($query) {
-//                    $query->where(['not', ['id' => $this->id]]);
-//                }, 
                 'message' => '{attribute} {value} มีอยู่แล้วในระบบ'
             ],
             [['name'], 'unique',
@@ -47,9 +44,12 @@ class Album extends \yii\db\ActiveRecord
                 'message' => '{attribute} {value} มีอยู่แล้วในระบบ',
                 'on' => 'update',
             ],
-            [['files'], 'file', 'extensions'=>'png, jpg, jpeg, gif, doc, docx, ppt, pptx, txt, pdf, mpeg, mpg, mp4, avi, mov, mp3, wav, ogg ', 'maxFiles' => 10],
+            [['files'], 'file', 'extensions'=>MediaType::getExtensionAsString(['image'])
+                , 'maxFiles' => 100
+            ],
             [['files'], 'required', 'on' => 'create'],
         ];
+        return $rules;
     }
 
     /**

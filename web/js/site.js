@@ -12,11 +12,11 @@ $(function () {
             switch (value) {
 
                 case "yes":
-                    window.location.href = $(this).attr('href')+'?album=new';
+                    window.location.href = $(this).attr('href')+'/new';
                     break;
 
                 case "exist":
-                    window.location.href = $(this).attr('href')+'?album=exist';
+                    window.location.href = $(this).attr('href')+'/exist';
                     break;
 
             }

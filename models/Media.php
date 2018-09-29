@@ -51,16 +51,7 @@ class Media extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        //optimizer lowest query
-        if($this->scenario === self::SCENARIO_CREATE){
-            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
-        }else if($this->scenario === self::SCENARIO_UPDATE){
-            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
-        }else if($this->scenario === self::SCENARIO_VIDEO){
-            $result[] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'];
-        }else if($this->scenario === self::SCENARIO_OTHER){
-            $result[] = [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'];
-        }
+        
         
         $result = [
             [['name', 'file_name', 'file_extension', 'file_path', 'file_upload_date', 'file_thumbnail_path', 'media_type_id'], 'required'],
@@ -75,10 +66,28 @@ class Media extends \yii\db\ActiveRecord
             [['media_file'], 'required', 'on'=>['create','video','other']],
             [['thumbnail_file'], \app\components\RequiredWhenOneEmptyValidator::className(), 'emptyAttribute'=>'thumbnail_from_video', 'on'=>'video'],
             [['thumbnail_file'], 'required', 'on'=>'other'],
+            
         ];
+        //optimizer lowest query
+        if($this->scenario === self::SCENARIO_CREATE){
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+        }else if($this->scenario === self::SCENARIO_UPDATE){
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+        }else if($this->scenario === self::SCENARIO_VIDEO){
+            $result[] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'];
+        }else if($this->scenario === self::SCENARIO_OTHER){
+            $result[] = [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'];
+        }
         return $result;
     }
-
+//    public function scenarios() {
+//        $scenarios = parent::scenarios();
+//        $scenarios[self::SCENARIO_CREATE] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+//        $scenarios[self::SCENARIO_UPDATE] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+//        $scenarios[self::SCENARIO_VIDEO] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'];
+//        $scenarios[self::SCENARIO_OTHER] = [$scenarios['default'],[['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other']];
+//        return $scenarios;
+//    }
     /**
      * @inheritdoc
      */
@@ -275,21 +284,25 @@ class Media extends \yii\db\ActiveRecord
         
         //get all media same condition to delete
         $models = static::find()->where($condition, $params)->all();
-        
-        $result = $command->execute();
         $file_paths = [];
         $thumbnail_paths = [];
-        if($result){
-            foreach($models as $model){
-                $file_path[] = $model->getFtpPath($setting);
+        foreach($models as $model){
+                $file_paths[] = $model->getFtpPath($setting);
                 $thumbnail_paths[] = $model->getThumbnailFtpPath($setting);
-            }
-            foreach($file_path as $path){
+        }
+        $directory = $models?dirname($file_paths[0]):'';
+        
+        $result = $command->execute();
+        
+        if($result){
+            foreach($file_paths as $path){
                 @$ftp->delete($path);
             }
             foreach($thumbnail_paths as $path){
                 @$ftp->delete($path);
             }
+            if($directory && $ftp->isEmpty($directory)) 
+                $ftp->rmdir($directory);
         }
         
         return $result;

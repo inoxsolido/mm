@@ -55,7 +55,7 @@ class MediaSearch extends Media {
         if(@$params['d']==1)$type[]=4;
         if(@$params['e']==1)$type[]=5;
         if($type !== [])$draftQuery->andWhere(['media_type_id'=>$type]);
-        
+        if(Yii::$app->user->isGuest)$draftQuery->andWhere(['is_public'=>true]);
         
         $draftQuery->orderBy(['file_upload_date' => SORT_DESC]);
         if(@$params['dr']!=""){

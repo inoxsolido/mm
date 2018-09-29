@@ -11,6 +11,9 @@ $resultModel = $dataProvider->getModels();
     .thumbnail > .thumbnail-img {
         height: 200px;
     }
+    .thumbnail > .thumbnail-img > a > img {
+        height: 200px;
+    }
     
     .content-list > .row {
         margin: 0 0 30px 0
@@ -66,7 +69,7 @@ $resultModel = $dataProvider->getModels();
         <?php else: ?>
         <?php foreach($resultModel as $model): ?>
         <div class="row">
-            <a href="#"><img class="pull-left" src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path'].'/'.$model['file_name'].$model['file_extension']?>" /></a>
+            <a href="#"><img class="pull-left" src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" /></a>
             <span class="caption pull-left">
                 <a class="title" href="#"><?=$model['name']?></a>
                 <p class="detail">
@@ -91,7 +94,7 @@ $resultModel = $dataProvider->getModels();
         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
             <div class="thumbnail">
                 <div class="thumbnail-img">
-                <a href="#"><img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path'].'/'.$model['file_name'].$model['file_extension']?>" alt=""/></a>
+                <a href="#"><img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" alt=""/></a>
                 </div>
                 <div class="caption">
                     <h4><a href="#"><?=$model['name']?></a></h4>

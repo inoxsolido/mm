@@ -108,27 +108,24 @@ class FileExtensionNotInValidator extends \yii\validators\FileValidator{
     
     public function clientValidateAttribute($model, $attribute, $view)
     {
-        $addpoint = function($e){
-            return '.'.$e;
-        };
+//        $addpoint = function($e){
+//            return '.'.$e;
+//        };
         $extension_list = $this->extensions;
         if(is_array($extension_list)){
-            $extension_list = array_map($addpoint, $extension_list);
+//            $extension_list = array_map($addpoint, $extension_list);
         }else{
             $extension_list = explode(' ', $this->extensions);
-            $extension_list = array_map($addpoint, $extension_list);
+//            $extension_list = array_map($addpoint, $extension_list);
         }
         $jsonExtension_list = json_encode($extension_list);
         return <<<JS
-        console.log(value);
-        
             var extension = /\.\w+$/.exec(value);
             if(extension != null) extension = String(extension).toLowerCase();
             if ( $.inArray(extension, $jsonExtension_list) != -1 ) {
                 messages.push('This file not allowed on this uploader.');
-                console.log($jsonExtension_list);
             }
-                console.log($jsonExtension_list);
+                
 JS;
     }
 }

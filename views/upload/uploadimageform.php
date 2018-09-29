@@ -84,7 +84,7 @@ Use exist album
                 //'maxFileSize'=>2800
 
             ],
-            'options' => ['accept' => 'image/*', 'multiple' => true]
+            'options' => ['accept' => app\models\MediaType::getExtensionAsString(['image']), 'multiple' => true]
         ]) ?>
         <div class="form-group">
             <?= Html::submitButton('Upload', ['id'=>'btnsubmit', 'class' => 'btn btn-primary', 'disabled'=>'disabled']) ?>
@@ -129,7 +129,7 @@ $(function(){
                     image.onload = function(imageEvent){
                         
                         let canvas = document.createElement('canvas'),
-                            width_lim = 200,//px
+                            width_lim = 300,//px
                             ratio = 9/16,//for height*3
                             height_lim = ratio * width_lim,
                             width = image.width,
@@ -153,7 +153,7 @@ $(function(){
                         let context = canvas.getContext('2d');
                         context.drawImage(image, 0, -(y/2), width, height);
                         
-                        var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        var dataUrl = canvas.toDataURL('image/jpeg', 1);
                         thumbnail_data.push(dataUrl);
                         $('<input />').attr('type', 'hidden')
                             .attr('name', "thumbnails[]")

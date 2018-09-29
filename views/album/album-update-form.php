@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
         <div style='float:left;'><?php if ($album): ?>
                 <button id="btnapplytag" class="btn btn-success">Use Album's tag</button><?php endif; ?></div>
         <div style='float:right'>
-            <button id="media-delete" class="btn btn-warning">Delete Selected Media</button>
+            <button id="media-delete" class="btn btn-warning" data-confirm="Are you sure you want to delete these item?">Delete Selected Media</button>
             <a href='<?= Url::to(['album/delete', 'id'=>@$album->id])?>' id="album-delete" class="btn btn-danger" data-method='post' data-confirm="Are you sure you want to delete this item?"> Delete Album</a>
             <button id="album-save" class="btn btn-primary">Save</button>
         </div>
@@ -93,7 +93,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
                     <!--checkbox-->
                     <td><input class="check-main" type="checkbox" value="<?= $m->id; ?>"/></td>
                     <!--preview-->
-                    <td><img src="<?= $m->getHttpPath() ?>" width="50"></td>
+                    <td><img src="<?= $m->getThumbnailHttpPath() ?>" width="50"></td>
                     <!--name-->
                     <td><input value="<?= $m->name ?>" class="in-name form-control" required=""/></td>
 
@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
 <script>
     var url={
         album_save: "<?= Url::to(['album/update']) ?>",
-        media_delete: "<?= Url::to(['media/delete-selected-media']) ?>",
+        media_delete: "<?= Url::to(['album/delete-selected-media']) ?>",
         check_album_name: "<?=Url::to(['album/check-album-name']) ?>"
     }
 </script>
@@ -219,6 +219,7 @@ $(document).ready(function(){
             errorPopUp("กรุณาเลือกไฟล์ก่อน");
             return false;
         }else{
+            if(!confirm('Are you sure you want to delete these item?')) return false;
             media_id_set = $.map(media_checked, function(media){
                 return $(media).val();
             });
@@ -268,8 +269,8 @@ $(document).ready(function(){
 
             
         });
-        media_set.length = 1;
-        console.log(media_set);
+//        media_set.length = 1;
+//        console.log(media_set);
         var m = JSON.stringify(media_set);
         console.log(m);
         $.ajax({
@@ -282,6 +283,7 @@ $(document).ready(function(){
                 media_set: media_set
             }
         }).done(function(responseText, textStatus, jqXHR){
+            $(".album-update").find("h1").text("แก้ไขอัลบั้ม "+album.name);
             successPopUp(jqXHR.responseText);
         }).fail(function(jqXHR,textStatus,errorThrown){
             if(jqXHR.status === 500){

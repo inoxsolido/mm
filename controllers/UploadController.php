@@ -15,21 +15,22 @@ use yii\helpers\Url;
 class UploadController extends Controller{
     
     
-    public function actionImage(){
-        $album = new Album;
-        $album->scenario = Album::SCENARIO_CREATE;
+    public function actionImage($album){
+        $m_album = new Album;
+        $m_album->scenario = Album::SCENARIO_CREATE;
         $getAlbum = Yii::$app->request->get('album');
+        if(Yii::$app->request->isGet && !($getAlbum == 'new' || $getAlbum == 'exist'))throw new \yii\web\HttpException('400', 'Parameter: album had unacceptable value.');
         if(Yii::$app->request->isAjax && Yii::$app->request->post('ajax')){
-            $album->load(Yii::$app->request->post());
+            $m_album->load(Yii::$app->request->post());
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return \yii\widgets\ActiveForm::validate($album);
+            return \yii\widgets\ActiveForm::validate($m_album);
         }
         if(Yii::$app->request->isPost && count($_FILES)){
-            $album->load(Yii::$app->request->post());
-            $album->files = UploadedFile::getInstances($album, 'files');
+            $m_album->load(Yii::$app->request->post());
+            $m_album->files = UploadedFile::getInstances($m_album, 'files');
             $thumbnails = Yii::$app->request->post('thumbnails');
             $i=0;$thumb_len=count($thumbnails);
-            if(thumb_len !== count($album->files)){
+            if($thumb_len !== count($m_album->files)){
                 Yii::$app->response->statusCode=405;
                 return "Number of thumbnails mismatch with a number of files.";
             }
@@ -37,15 +38,16 @@ class UploadController extends Controller{
             $setting = \app\models\Settings::getSetting();
             $ftp;//declare for exception catching
             $writen_filename = [];
+            $real_temp_path = '';
             $transaction = Yii::$app->db->beginTransaction();
             try{
                 if($getAlbum === 'new')
-                    if(!$album->save())
+                    if(!$m_album->save())
                         throw new \Exception("An error was found while saving new album.");
                     else
-                        $album_id = $album->id;
+                        $m_album_id = $m_album->id;
                 else
-                    $album_id = $album->getIdByName();
+                    $m_album_id = $m_album->getIdByName();
                 
                 
                 $ftp = new \app\components\FtpClient();
@@ -53,20 +55,20 @@ class UploadController extends Controller{
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
                 $ftp->pasv(true);
                 
-                foreach ($album->files as $file) {
+                foreach ($m_album->files as $file) {
                     $media = new Media;
                     $media->updateFileDate();
-                    $media->album_id = $album_id;
+                    $media->album_id = $m_album_id;
                     $media->name = preg_replace('/\.\w+$/', '', $file->name);//remove file extension
                     //Check Extension In MediaType
 //                    $mediaType = MediaType::find()->where(['LIKE', 'extension', $file->file_extension])->one();
                     $media->media_type_id = 2; //fixed by user
                     //                  Type/Album name
-                    $media->file_path = $media->mediaType->name . '/' . $album->name;
+                    $media->file_path = $media->mediaType->name . '/' . $m_album->name;
                     $media->file_name = $media->getNewFileName();
                     $media->file_extension = '.' . $file->getExtension();
                     
-                    $thumbnails[$i];
+                    $media->thumbnail_from_video = $thumbnails[$i];
                     $temp_path = "uploads/temp/" . Yii::$app->getSecurity()->generateRandomString(4);
                     $real_temp_path = Yii::getAlias("@realwebroot/$temp_path");
                     $real_temp_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $real_temp_path);
@@ -76,8 +78,8 @@ class UploadController extends Controller{
                         $real_temp_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $real_temp_path);
                     }
                     // store base64 to jpeg file
-                    \file_put_contents($real_temp_path, $thumbnails[$i]);
-                    $media->file_thumbnail_path = $media->mediaType->name.'/thumbnail_'. $model->file_name.'.jpeg';
+                    \file_put_contents($real_temp_path, $media->getThumbnailDecoded());
+                    $media->file_thumbnail_path = 'thumbnails/thumbnail_'. $media->file_name.'.jpeg';
 //                    $media->file_thumbnail_path = $media->file_path;
                     $i++;
                     $media->is_public = 0;
@@ -85,24 +87,26 @@ class UploadController extends Controller{
                         throw new \Exception("An error was found while saving {$media->name}.". print_r($media->errors));
                     }
                     
-                    $create_path = $setting->ftp_part .'/'. $media->mediaType->name .'/'. $album->name ;       
+                    $create_path = $setting->ftp_part .'/'. $media->mediaType->name .'/'. $m_album->name ;       
                     $ftp->chdir($setting->ftp_part);
                     $ftp->make_directory($create_path);
+                    $ftp->make_directory($setting->ftp_part .'/thumbnails');
                     if(!$ftp->put($media->getFtpPath($setting), $file->tempName, FTP_BINARY))
-                            throw new \Exception("An error was found while putting {$media->name} to File server.");
-                    $ftp->chmod(0755, $media->getFtpPath($setting));
+                            throw new \yii2mod\ftp\FtpException("An error was found while putting {$media->name} to File server.");
+                   
                     // put file(thumbnail) to server
-                    if(!$ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY))
-                            throw new \Exception("An error was found while putting thumbnail_{$media->name} to File server.");
-                    $ftp->chmod(0755, $model->getThumbnailFtpPath($setting));
-                    unlink($real_temp_path);
+                    if(!$ftp->put($media->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY))
+                            throw new \yii2mod\ftp\FtpException("An error was found while putting thumbnail_{$media->name} to File server.");
+                    
+                    @unlink($real_temp_path);
                     $writen_filename[] = $media->getFtpPath($setting);
                     $writen_filename[] = $media->getThumbnailFtpPath($setting);
                 }
                 $transaction->commit();
-                return Url::to(['album/update', 'id' => $album_id]);
+                return Url::to(['album/update', 'id' => $m_album_id]);
             } catch (\Exception $ex) {
                 $transaction->rollback();
+                @unlink($real_temp_path);
                 if(!($ex instanceof \yii2mod\ftp\FtpException) && !empty($writen_filename)){
                     $folder = dirname($writen_filename[0]);
                 
@@ -121,7 +125,7 @@ class UploadController extends Controller{
         $list_album_name = \yii\helpers\ArrayHelper::map(Album::find()->all(), 'name', 'name');
 
         return $this->render('./uploadimageform', [
-                    'model' => $album, 'getAlbum' => $getAlbum, 'list_album' => $list_album_name
+                    'model' => $m_album, 'getAlbum' => $getAlbum, 'list_album' => $list_album_name
         ]);
     }
     
@@ -143,16 +147,16 @@ class UploadController extends Controller{
             $model->load(Yii::$app->request->post());
             //get files to model
             $model->media_file = UploadedFile::getInstance($model, 'media_file');
-            
             $fileType = \app\models\MediaType::findOne(Yii::$app->request->post('type'));
             if (!$fileType){ Yii::$app->response->statusCode = 500; return "Parameter is missing."; }
+            $real_temp_path='';
             try{
                 $setting = \app\models\Settings::getSetting();
                 $ftp = new \app\components\FtpClient();
                 $ftp->connect($setting->ftp_host);
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
                 $ftp->pasv(true);
-                Yii::$app->utility->debug($ftp);
+//                Yii::$app->utility->debug($ftp);
                 //CREATE TEMP FOLDER IN WEB SERVER
                 \yii\helpers\FileHelper::createDirectory('uploads/temp/');
                 
@@ -163,35 +167,24 @@ class UploadController extends Controller{
                 $model->file_name = $model->getNewFileName();
                 $model->file_extension = '.' . $model->media_file->getExtension();
                 
-                
-//                $mediaType = MediaType::find()->where(['LIKE', 'extension', $model->file_extension])->one();
-//                $model->media_type_id = @mediaType?$mediaType->id:5;//if mediatype is found use it else 5 meaning Etc
+
                 $model->media_type_id = 1;
                 
                 $create_path = $setting->ftp_part .'/'. $model->mediaType->name ;
                 $ftp->chdir($setting->ftp_part);
                 $ftp->make_directory($create_path);//prepare folder for file
                 $ftp->put($model->getFtpPath($setting), $model->media_file->tempName, FTP_BINARY);
-                $ftp->chmod(0777,$model->getFtpPath($setting));
-                
-                //thumbnail
-//                echo $model->getThumbnailDecoded();
-//                echo $model->thumbnail_from_video;
-//                print_r($_POST);
-//                print_r($model);
-//                
-//                die();
-                
+
                 if($model->getThumbnailDecoded()==null){
-//                    echo 'เน€เธ�เน�เธฒเธ�เธ�'; die();
+
                     $model->thumbnail_file = UploadedFile::getInstance($model, 'thumbnail_file');
                     $model->file_thumbnail_path = $fileType->name .'/thumbnail_'. $model->file_name.'.'. $model->thumbnail_file->getExtension();
                     $real_temp_path = $model->thumbnail_file->tempName;
                     $ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY);
-                    $ftp->chmod(0777, $model->getThumbnailFtpPath($setting));
+                   
                     
                 }else{
-//                    echo 'เน€เธ�เน�เธฒเธฅเน�เธฒเธ�'; die();
+
                     $model->file_thumbnail_path = $fileType->name .'/thumbnail_'. $model->file_name.'.jpeg';
                     $temp_path = "uploads/temp/" . Yii::$app->getSecurity()->generateRandomString(16);
                     $real_temp_path = Yii::getAlias("@realwebroot/$temp_path");
@@ -204,9 +197,8 @@ class UploadController extends Controller{
                     // store base64 to jpeg file
                     \file_put_contents($real_temp_path, $model->thumbnail_from_video);
                     // put file to server
-                    $ftp->put(iconv("UTF-8","TIS-620",$model->getThumbnailFtpPath($setting)), $real_temp_path, FTP_BINARY);
-                    $ftp->chmod(0777, $model->getThumbnailFtpPath($setting));
-                    unlink($real_temp_path);
+                    $ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY);
+                    @unlink($real_temp_path);
                 }
                 $model->scenario = "default";
                 if (!$model->save()) {
@@ -217,9 +209,8 @@ class UploadController extends Controller{
                     return Url::to(['media/media-edit', 'id' => $model->id]);
                 }
 
-                
-                
             } catch (\Exception $ex) {
+                @unlink($real_temp_path);
                 Yii::$app->response->statusCode = 500;
                 return $ex->getMessage();
             }
@@ -232,7 +223,7 @@ class UploadController extends Controller{
 
     
     public function actionOther(){
-        $model = new Media();
+        $model = new Media(['scenario'=>Media::SCENARIO_OTHER]);
         $model->scenario = Media::SCENARIO_OTHER;
         if(Yii::$app->request->isAjax && Yii::$app->request->post('ajax') === 'w0'){
             $model->load(Yii::$app->request->post());
@@ -274,7 +265,6 @@ class UploadController extends Controller{
                 $ftp->chdir($setting->ftp_part);
                 $ftp->make_directory($create_path );//prepare folder for file
                 $ftp->put($model->getFtpPath($setting), $model->media_file->tempName, FTP_BINARY);
-                $ftp->chmod(0777,$model->getFtpPath($setting));
                 
                 //thumbnail
 
@@ -282,7 +272,6 @@ class UploadController extends Controller{
                 $model->file_thumbnail_path = $mediaType->name .'/thumbnail_'. $model->file_name.'.'. $model->thumbnail_file->getExtension();
                 $real_temp_path = $model->thumbnail_file->tempName;
                 $ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY);
-                $ftp->chmod(0777, iconv("UTF-8","TIS-620",$model->getThumbnailFtpPath($setting)));
                     
                 
                 $model->scenario = "default";
