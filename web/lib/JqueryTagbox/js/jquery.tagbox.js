@@ -30,7 +30,6 @@ tagbox.split_event = function (e) {
             val = $.trim($t.val());
     $t.data("tmap", tmap);
     if ($.inArray(n, [9, 13]) !== -1) {//tab, enter
-        if(n===9 && val === '') return true;
         if (val !== "" && tmap[val] === undefined) {
             tmap[val] = 1;
 
