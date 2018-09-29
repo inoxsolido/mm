@@ -142,3 +142,15 @@ a.desc:after {
     background-color: inherit;
 }
 }
+#loading{
+    position:fixed;
+    z-index: 2000;
+    width:100%;
+    height:100%;
+    background-color: white;
+    opacity: 0.25;
+    display:none;
+    text-align: center; 
+    vertical-align: middle; 
+    line-height: 50;
+}

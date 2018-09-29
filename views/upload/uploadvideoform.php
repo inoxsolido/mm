@@ -216,7 +216,11 @@ use yii\helpers\Url;
     var bar = $('.bar');
     var percent = $('.percent');
     // var status = $('#status');
- 
+    
+    $('form').on('beforeSubmit', function (e) {
+        $("#loading").show();
+        return true;
+    });
     $('form').ajaxForm({
         data:{
             type:"1",

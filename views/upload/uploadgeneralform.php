@@ -109,9 +109,7 @@ $(function(){
     var percent = $('.percent');
     // var status = $('#status');
     $('form').on('beforeSubmit', function (e) {
-        if (!confirm("Everything is correct. Submit?")) {
-            return false;
-        }
+        $("#loading").show();
         return true;
     });
     $('form').ajaxForm({
@@ -154,13 +152,13 @@ $(function(){
             var percentVal = '100%';
             bar.width(percentVal);
             percent.html(percentVal);
+            successPopUp("Upload Successful");
             window.location = responseText;
         },
         error: function(xhr){
             bar.width(0);
             percent.html(xhr.responseText);
             errorPopUp(xhr.responseText);
-            $("#loading").hide();
         },
         complete: function (xhr) {
             // status.html(xhr.responseText);

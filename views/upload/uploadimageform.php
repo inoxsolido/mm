@@ -194,6 +194,10 @@ $(function(){
 //        
 //        return false;
 //    });
+    $('form').on('beforeSubmit', function (e) {
+        $("#loading").show();
+        return true;
+    });
     $('form').ajaxForm({
         data:{
             type:"2",

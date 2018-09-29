@@ -155,6 +155,7 @@ class MediaController extends Controller
     public function actionDelete($id){
         $media = $this->findModel($id);
         //backup file path and thumbnail path
+        $name = $media->name;
         if($media->delete()){
             Yii::$app->getSession()->setFlash(
                     'success', "$name deleted"
@@ -172,7 +173,7 @@ class MediaController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = User::findOne($id)) !== null)
+        if (($model = Media::findOne($id)) !== null)
         {
             return $model;
         }
