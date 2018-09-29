@@ -34,6 +34,7 @@ class Media extends \yii\db\ActiveRecord
      */
 
     const SCENARIO_CREATE = "create";
+    const SCENARIO_UPDATE = "update";
     const SCENARIO_VIDEO = "video";
     const SCENARIO_OTHER = "other";
 
@@ -50,7 +51,18 @@ class Media extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        //optimizer lowest query
+        if($this->scenario === self::SCENARIO_CREATE){
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+        }else if($this->scenario === self::SCENARIO_UPDATE){
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+        }else if($this->scenario === self::SCENARIO_VIDEO){
+            $result[] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'];
+        }else if($this->scenario === self::SCENARIO_OTHER){
+            $result[] = [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'];
+        }
+        
+        $result = [
             [['name', 'file_name', 'file_extension', 'file_path', 'file_upload_date', 'file_thumbnail_path', 'media_type_id'], 'required'],
             [['id', 'is_public', 'media_type_id', 'album_id'], 'integer'],
             [['file_path', 'tags'], 'string'],
@@ -59,13 +71,12 @@ class Media extends \yii\db\ActiveRecord
             [['file_extension'], 'string', 'max' => 10],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
             [['media_type_id'], 'exist', 'skipOnError' => false, 'targetClass' => MediaType::className(), 'targetAttribute' => ['media_type_id' => 'id']],
-            [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')],
-            [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'],
-            [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'],
+            
             [['media_file'], 'required', 'on'=>['create','video','other']],
             [['thumbnail_file'], \app\components\RequiredWhenOneEmptyValidator::className(), 'emptyAttribute'=>'thumbnail_from_video', 'on'=>'video'],
             [['thumbnail_file'], 'required', 'on'=>'other'],
         ];
+        return $result;
     }
 
     /**
@@ -248,17 +259,19 @@ class Media extends \yii\db\ActiveRecord
             throw $e;
         }
     }
-    //not complete
-    public static function deleteAll($condition = null, $params = [])
+    
+    public static function deleteAll($condition = null, $params = [], $ftp='')
     {
         $command = static::getDb()->createCommand();
         $command->delete(static::tableName(), $condition, $params);
         
         $setting = Settings::getSetting();
-        $ftp = new \app\components\FtpClient();
-        $ftp->connect($setting->ftp_host);
-        $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-        $ftp->pasv(true);
+        if(!$ftp){
+            $ftp = new \app\components\FtpClient();
+            $ftp->connect($setting->ftp_host);
+            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+            $ftp->pasv(true);
+        }
         
         //get all media same condition to delete
         $models = static::find()->where($condition, $params)->all();
@@ -274,7 +287,7 @@ class Media extends \yii\db\ActiveRecord
             foreach($file_path as $path){
                 @$ftp->delete($path);
             }
-            foreach($thumbnail_paths as $t){
+            foreach($thumbnail_paths as $path){
                 @$ftp->delete($path);
             }
         }
