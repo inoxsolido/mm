@@ -23,12 +23,20 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             td{
                 vertical-align: middle !important;
             }
+            .alert-popup{
+                position: fixed;
+                width: 100%;
+                top: 60px;
+                left: 0;
+                z-index: 1030;
+                text-align: center;
+            }
         </style>
     </head>
     <body class="hold-transition skin-red-light sidebar-mini sidebar-collapse">
         <?php $this->beginBody()?>
-        <div id="error-messages" class="alert alert-danger" style="opacity: 1; display: none"></div>
-        <div id="success-messages" class="alert alert-success" style="opacity: 1; display: none"></div>
+        <div id="error-messages" class="alert alert-danger alert-popup" style="opacity: 1; display: none"></div>
+        <div id="success-messages" class="alert alert-success alert-popup" style="opacity: 1; display: none"></div>
         <div id='loading' style='position:absolute;z-index: 2000; width:100%; height:100%; background-color: white; opacity: 0.25;display:none;text-align: center; vertical-align: middle; line-height: 50'>loading</div>
         <div class="wrapper">
 
