@@ -15,7 +15,7 @@ $user = Yii::$app->user->identity or (!Yii::$app->user->isGuest);
         <div class="navbar-header" style="float:left;">
             <a class="logo" href="<?= Yii::$app->homeurl ?>" style="padding:0 !important; float:left;width:auto;">
                 
-                <?= Html::img("/img/LOGO230.png", ['width' => 230, 'height' => 50, 'class' => '', 'style' => 'min-width:230px !important; margin:0px; display:inline-block;']) ?>
+                <?= Html::img(Yii::$app->request->baseUrl."/img/LOGO230.png", ['width' => 230, 'height' => 50, 'class' => '', 'style' => 'min-width:230px !important; margin:0px; display:inline-block;']) ?>
             </a>
             <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                 <span class="sr-only">Toggle navigation</span>
