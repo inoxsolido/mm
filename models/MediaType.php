@@ -30,8 +30,8 @@ class MediaType extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['name'], 'string', 'max' => 45, 'filter', 'filter'=>'strtolower'],
-            [['extension'], 'string', 'max' => 255, 'filter', 'filter'=>'strtolower'],
+            [['name'], 'string', 'max' => 45],
+            [['extension'], 'string'],
         ];
     }
 
