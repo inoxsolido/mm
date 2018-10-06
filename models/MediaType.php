@@ -62,7 +62,7 @@ class MediaType extends \yii\db\ActiveRecord
             $result .= ' '.$arr['extension'];
         }
 //        $result = str_replace(",", "", $result);
-//        $result = str_replace(".", "", $result);
+        $result = str_replace(".", "", $result);
         return $result;
     }
 }
