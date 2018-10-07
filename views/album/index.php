@@ -27,7 +27,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'enableSorting' => false,
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'detail' =>function($url, $model, $key){
+                        $title = Yii::t('yii', 'detail');
+                        $options = [
+                            'title' => $title,
+                            'aria-label' => $title,
+                            'data-pjax' => '0',
+                        ];
+                        $icon = Html::tag('span', '', ['class' => "glyphicon glyphicon-eye-open"]);
+                        return Html::a($icon, $url, $options);
+                    },
+                ],
+                'template'=>'{detail}{update}{delete}'
+            ],
         ],
     ]); ?>
 <?php Pjax::end(); ?></div>
