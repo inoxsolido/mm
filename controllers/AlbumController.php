@@ -313,7 +313,7 @@ class AlbumController extends Controller
     
     
     /**
-     * Displays a single Album model.
+     * Displays a single Album model with detail.
      * @param integer $id
      * @return mixed
      */
@@ -334,7 +334,11 @@ class AlbumController extends Controller
             'setting' => Settings::getSetting()
         ]);
     }
-
+    /**
+     * Display a single Album model without detail.
+     * @param int $id
+     * @return mixed
+     */
     public function actionView($id){
         $album = $this->findModel($id);
         $mediaDataProvider = new \yii\data\ActiveDataProvider([
@@ -351,6 +355,7 @@ class AlbumController extends Controller
             'setting' => Settings::getSetting()
         ]);
     }
+    
     
     /**
      * Finds the Album model based on its primary key value.
