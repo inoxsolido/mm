@@ -317,7 +317,7 @@ class AlbumController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionDetail($id)
     {
         $album = $this->findModel($id);
         $mediaDataProvider = new \yii\data\ActiveDataProvider([
@@ -328,13 +328,17 @@ class AlbumController extends Controller
                 'pageSizeParam' => false,
             ],
         ]);
-        return $this->render('view', [
+        return $this->render('detail', [
             'album' => $album,
             'mediaDataProvider'=>$mediaDataProvider,
             'setting' => Settings::getSetting()
         ]);
     }
 
+    public function actionView(){
+        
+    }
+    
     /**
      * Finds the Album model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
