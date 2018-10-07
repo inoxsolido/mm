@@ -335,8 +335,21 @@ class AlbumController extends Controller
         ]);
     }
 
-    public function actionView(){
-        
+    public function actionView($id){
+        $album = $this->findModel($id);
+        $mediaDataProvider = new \yii\data\ActiveDataProvider([
+            'query' => Media::find()->where(['album_id'=>$album->id])->orderBy(['file_upload_date'=>SORT_ASC]),
+            'pagination' => [
+                'pageParam' => 'p',
+                'pageSize' => 20,
+                'pageSizeParam' => false,
+            ],
+        ]);
+        return $this->render('view', [
+            'album' => $album,
+            'mediaDataProvider'=>$mediaDataProvider,
+            'setting' => Settings::getSetting()
+        ]);
     }
     
     /**
