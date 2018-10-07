@@ -1,5 +1,6 @@
 <?php 
 use app\components\CustomLinkPager;
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $resultModel Array of \app\models\Media */
 /* @var $dataProvider yii\data\SqlDataProvider */
@@ -74,7 +75,7 @@ $resultModel = $dataProvider->getModels();
                 <a class="title" href="#"><?=$model['name']?></a>
                 <p class="detail">
                     <?php if($model['album_id']):?>
-                    From Album: <a href="#"><?=$model['album_name']?></a>
+                    From Album: <a href="<?= Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a>
                     <?php endif; ?>
                     <br/>
                     Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?>
@@ -98,7 +99,7 @@ $resultModel = $dataProvider->getModels();
                 </div>
                 <div class="caption">
                     <h4><a href="#"><?=$model['name']?></a></h4>
-                    <p>Album: <a href="#"><?=$model['album_name']?></a></p>
+                    <p>Album: <a href="<?=Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a></p>
                     <p>Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?></p>
                 </div>
             </div>
