@@ -105,6 +105,29 @@ class SearchController extends Controller {
             ]);
         }
     }
+    
+    public function actionDirectory(){
+        $path = Yii::$app->request->get('path');
+        $path = str_replace("..","",$path);
+        $path = preg_replace('/\/+/', '/', $path);
+        if(strpos($path, '..'))
+            $path='';
+        
+        $setting = Settings::getSetting();
+        /* @var $setting Settings */
+        $ftp = new \app\components\FtpClient();
+        $ftp->connect($setting->ftp_host);
+        $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+        $ftp->pasv(true);
+        try{
+            $list = $ftp->scanDir($setting->ftp_part.$path);
+            return $this->render('directory', ['list'=>$list, 'path'=>$path]);
+        } catch (\Exception $ex) {
+            throw new \yii\web\HttpException('404', 'Page not found.');
+        }
+        
+        
+    }
 
     //ajax suggest-words
     //return as json
