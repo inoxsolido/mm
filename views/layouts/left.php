@@ -13,12 +13,12 @@
                     ['label' => '', 'options' => ['class' => 'header']],
                     ['label' => 'Search', 'icon' => 'search', 'url' => ['/search/index']],
                     ['label' => 'Directory Search', 'icon' => 'folder', 'url' => '#'],
-                    ['label' => 'Album', 'icon' => 'book', 'url' => '#'],
-                    ['label' => 'Video', 'icon' => 'file-video-o', 'url' => '#'],
-                    ['label' => 'Image', 'icon' => 'file-image-o', 'url' => '#'],
-                    ['label' => 'Audio', 'icon' => 'file-audio-o', 'url' => '#'],
-                    ['label' => 'Document', 'icon' => 'file-text-o', 'url' => '#'],
-                    ['label' => 'Etc.', 'icon' => 'file-o', 'url' => '#'],
+                    ['label' => 'Album', 'icon' => 'book', 'url' => ['/search/album']],
+                    ['label' => 'Video', 'icon' => 'file-video-o', 'url' =>['/search/index/?v=1']],
+                    ['label' => 'Image', 'icon' => 'file-image-o', 'url' => ['/search/index/?i=1']],
+                    ['label' => 'Audio', 'icon' => 'file-audio-o', 'url' => ['/search/index/?a=1']],
+                    ['label' => 'Document', 'icon' => 'file-text-o', 'url' => ['/search/index/?d=1']],
+                    ['label' => 'Etc.', 'icon' => 'file-o', 'url' => ['/search/index/?e=1']],
                     
                 ],
             ]

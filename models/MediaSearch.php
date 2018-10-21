@@ -69,8 +69,7 @@ class MediaSearch extends Media {
             $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
             $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
             $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
-            $query4 = clone $draftQuery; //4. มีคำบางคำและคำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (Or condition)
-            $query5 = clone $draftQuery; //5. มีคำที่เกี่ยวข้องอยู่ตรงไหนของRecordก็ได้
+            $query4 = clone $draftQuery; //5. มีคำที่เกี่ยวข้องอยู่ตรงไหนของRecordก็ได้
 
             
             $pattern1 = ''; //for $query2
@@ -87,8 +86,13 @@ class MediaSearch extends Media {
                     ]);
                 }
                 $pattern3 = '^.*' . join('|', $splited_q) . '.*$';
-                if ($params['related_word'] != [])
+                if ($params['related_word'] != []){
                     $pattern4 = '^.*' . join('|', $params['related_word']) . '.*$'; //รอ
+                    $query4->andWhere(['or',
+                        ['REGEXP', 'album.name', $pattern4],
+                        ['REGEXP', 'album.tags', $pattern4]
+                    ]);
+                }
             }
             $query1->andWhere(['or',
                 ['like', 'album.name', $params['q']],
@@ -98,14 +102,7 @@ class MediaSearch extends Media {
                 ['REGEXP', 'album.name', $pattern1],
                 ['REGEXP', 'album.tags', $pattern1],
             ]);
-            $query4->andWhere(['or',
-                ['REGEXP', 'album.name', $pattern3],
-                ['REGEXP', 'album.tags', $pattern3]
-            ]);
-            $query5->andWhere(['or',
-                ['REGEXP', 'album.name', $pattern4],
-                ['REGEXP', 'album.tags', $pattern4]
-            ]);
+            
             
 
             $final_query = $query1->union($query2)

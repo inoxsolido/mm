@@ -60,4 +60,21 @@ class FrequencyRelation extends \yii\db\ActiveRecord
         }
         return true;
     }
+    /**
+     * Function to get related word from query
+     * @param string $query query string
+     * @param Object $setting Instead of \app\models\Settings
+     * @return array Empty array is returned if the results is nothing.
+     */
+    public static function getRelatedWord($query, $setting=''){
+        if($setting == '') $setting = Settings::getSetting();
+        $freg_relation_rate = $setting->frequency_relation_rate;
+        $related_word = [];
+        $sql = "SELECT word1 as word,frequency FROM frequency_relation WHERE word2 LIKE '%$query%' AND frequency >= $freg_relation_rate \n"
+                . "UNION \n"
+                . "SELECT word2 as word,frequency FROM frequency_relation WHERE word1 LIKE '%$query%' AND frequency >= $freg_relation_rate \n"
+                . "ORDER BY frequency DESC";
+        $related_word = Yii::$app->db->createCommand($sql)->queryColumn('word');
+        return $related_word;
+    }
 }

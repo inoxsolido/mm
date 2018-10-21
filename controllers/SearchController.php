@@ -90,8 +90,20 @@ class SearchController extends Controller {
                     'dataProvider' => $dataProvider,
                     'setting' => $setting,
         ]);
-
-      
+    }
+    
+    public function actionAlbum(){
+        
+        $q = Yii::$app->request->get('q');
+        if(Yii::$app->request->isAjax){return 'ajaxajx';}
+        else{
+            $searchModel = new \app\models\AlbumSearch();
+            $dataProvider = $searchModel->search($q);
+            return $this->render('/search/main_album', [
+                    'dataProvider' => $dataProvider,
+                    'setting' => Settings::getSetting(),
+            ]);
+        }
     }
 
     //ajax suggest-words
@@ -109,9 +121,12 @@ class SearchController extends Controller {
                 $oneWordFlag = 1;
             }
             //ตัวอักษร/คำ ขึ้นต้น
-            $result1 = Dictionary::find()->where(["LIKE", "word", $lastword . "%", false])->select("word")->asArray()->all();
+            $result1 = Dictionary::find()->where(["LIKE", "word", $lastword . "%", false])->select("word")->limit(10)->asArray()->all();
+            $result2_limit = max(0,10-count($result1));
             //ตัวอักษร/คำ อยู่ตรงในก็ได้
-            $result2 = Dictionary::find()->where(["LIKE", "word", $lastword])->andWhere(["NOT IN", "word", $result1])->select("word")->asArray()->all();
+            $result2 = [];
+            if($result2_limit > 0)
+                $result2 = Dictionary::find()->where(["LIKE", "word", $lastword])->andWhere(["NOT IN", "word", $result1])->select("word")->limit($result2_limit)->asArray()->all();
             //merge arrays
             $merged = array_merge($result1, $result2);
             //2Dim to 1Dim Convert

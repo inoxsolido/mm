@@ -38,7 +38,7 @@ class AlbumController extends Controller
     public function actionIndex()
     {
         $searchModel = new AlbumSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->filter(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
