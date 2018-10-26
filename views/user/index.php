@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>'html',
                 'value'=> function($data){
                     if($data->image_path)
-                        return \yii\helpers\Html::img("/".$data->image_path, ['class'=>'img-circle', 'style'=>'height:50px']);
+                        return $data->getImage(['class'=>'img-circle', 'style'=>'height:50px']);
                     else
                         return '<span class="user-image"><i class="fa fa-user-circle fa-4x"></i></span>';
                 },

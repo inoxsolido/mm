@@ -71,18 +71,25 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
-    public function getImage(){
+    public function getImageUrl(){
         if($this->image_path){
-            return \yii\helpers\Html::img(Yii::getAlias('@web',false).'/'.$this->image_path, ['class'=>'user-image']);
+            return Yii::getAlias('@web',false).'/'.$this->image_path;
+        }
+        return "";
+    }
+    
+    public function getImage($options=['class'=>'user-image']){
+        if($this->image_path){
+            return \yii\helpers\Html::img($this->getImageUrl(), $options);
         }else{
-            return "";
+            return '<span class="user-image"><i class="fa fa-user-circle fa-4x"></i></span>';
         }
     }
-    public function getImageCircle(){
+    public function getImageCircle($options=['class'=>'img-circle']){
         if($this->image_path){
-            return \yii\helpers\Html::img(Yii::getAlias('@web',false).'/'.$this->image_path, ['class'=>'img-circle']);
+            return \yii\helpers\Html::img($this->getImageUrl(), $options);
         }else{
-            return "";
+            return '<span class="user-circle"><i class="fa fa-user-circle fa-4x"></i></span>';
         }
     }
     /**
