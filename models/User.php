@@ -73,14 +73,14 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
     public function getImage(){
         if($this->image_path){
-            return \yii\helpers\Html::img("/".$this->image_path, ['class'=>'user-image']);
+            return \yii\helpers\Html::img(Yii::$app->request->baseUrl.'/'.$this->image_path, ['class'=>'user-image']);
         }else{
             return "";
         }
     }
     public function getImageCircle(){
         if($this->image_path){
-            return \yii\helpers\Html::img("/".$this->image_path, ['class'=>'img-circle']);
+            return \yii\helpers\Html::img(Yii::$app->request->baseUrl.'/'.$this->image_path, ['class'=>'img-circle']);
         }else{
             return "";
         }
