@@ -86,6 +86,10 @@ $config = [
 //        ],
         'db' => require(__DIR__ . '/db.php'),
     ],
+    'on afterAction' => function (yii\base\ActionEvent $e) {
+        if($e->action->id !== 'login' && $e->action->controller->module->id !== 'debug')
+            Yii::$app->user->setReturnUrl(Yii::$app->request->url);
+    },
     'params' => $params,
     
 ];
