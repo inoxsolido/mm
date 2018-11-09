@@ -223,19 +223,19 @@ class UserController extends Controller
         if($user->user_type_id ==1 && 
             User::find()->where(['!=', 'id', $user->id])->andWhere(['user_type_id'=>1])->count() == 0){
             Yii::$app->getSession()->setFlash('error', 'Require at least 1 account as administrator.'); 
-            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+            return $this->goback();
         }
         $file_path = $user->image_path;
         if(file_exists($file_path) && !@unlink($file_path)){
-            Yii::$app->getSession()->setFlash('error', 'Error while delete profile image.'); 
-            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+//            Yii::$app->getSession()->setFlash('error', 'Error while delete profile image.'); 
+//            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
         }
         
         $user->delete();
         Yii::$app->getSession()->setFlash(
                 'success', 'User Deleted'
         );
-        return $this->redirect(['index']);
+        return $this->goback();
     }
 
     /**
