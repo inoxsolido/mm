@@ -18,11 +18,12 @@ class DictionarySearch extends Dictionary
     public function rules()
     {
         return [
-            [['id', 'length'], 'integer'],
+            [['id'], 'integer'],
             [['word'], 'safe'],
+            [['length'], 'validateLength']
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -31,7 +32,11 @@ class DictionarySearch extends Dictionary
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
+    public function validateLength($attribute, $params, $validator){
+        if(!preg_match('/^(=|>|>=|<=|<)\d+$/', $this->$attribute)){
+            $this->addError($attribute, "{attribute} Must be Integer");
+        }
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -57,11 +62,15 @@ class DictionarySearch extends Dictionary
             // $query->where('0=1');
             return $dataProvider;
         }
+        if(preg_match('/^(?<prefix>=|>|>=|<=|<)(?<value>\d+)$/', $this->length, $match)){
+            $condition = $match['prefix'];
+            $value = $match['value'];
+            $query->andFilterWhere([$condition, 'length', $value]);
+        }
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'length' => $this->length,
         ]);
 
         $query->andFilterWhere(['like', 'word', $this->word]);

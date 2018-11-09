@@ -27,7 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 //            'id',
             'word',
-            'length',
+            [
+                'attribute' => 'length',
+                'filter' => Yii::$app->controller->renderPartial('/template/input_with_comparation_dropdown',['attributeName'=>'DictionarySearch[length]'])
+            ],
 
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>"{update}{delete}",
