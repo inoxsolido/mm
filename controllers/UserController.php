@@ -89,7 +89,7 @@ class UserController extends Controller
         if ($model->load(Yii::$app->request->post()))
         {
 
-            \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
+            \yii\helpers\FileHelper::createDirectory("uploads/");
             $model->image_file = \yii\web\UploadedFile::getInstance($model, 'image_file');
             
             $model->password = Yii::$app->encryption->encryptUserPassword($model->password);
@@ -97,9 +97,9 @@ class UserController extends Controller
             
             if ($model->image_file)
             {
-                $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
+                $model->image_path = "uploads/".Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
                 while(file_exists($model->image_path)){
-                    $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
+                    $model->image_path = "uploads/".Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
                 }
                 if ($model->validate())
                     $model->image_file->saveAs($model->image_path);
@@ -149,7 +149,7 @@ class UserController extends Controller
         $selector = $query->all();
         if ($model->load(Yii::$app->request->post()))
         {
-            \yii\helpers\FileHelper::createDirectory("uploads/" . $model->username . "/");
+            \yii\helpers\FileHelper::createDirectory("uploads/");
             $model->image_file = \yii\web\UploadedFile::getInstance($model, 'image_file');
             //check password change
             $encrypedPassword = Yii::$app->encryption->encryptUserPassword($model->password);
@@ -168,17 +168,15 @@ class UserController extends Controller
             //check profile image change
             if ($model->image_file)
             {
-                $old_file = $model->image_path;
-                $model->image_path = "uploads/" . $model->username . "/" . Yii::$app->security->generateRandomString() . '.' . $model->image_file->extension;
                 if ($validate){
-                    if(file_exists($old_file) && !@unlink($old_file)){
-                        Yii::$app->getSession()->setFlash('error', 'Error while delete old profile image.'); 
+                    if(!$model->image_file->saveAs($model->image_path)){
+                        Yii::$app->getSession()->setFlash('error', 'Error while saving profile image.'); 
                         return $this->render('update', [
                             'model' => $model,
                             'selector'=>$selector,
                         ]);                       
                     }
-                    $model->image_file->saveAs($model->image_path);
+                    
                 }
             }
             if($model->getOldAttribute('user_type_id') ==1 && 
