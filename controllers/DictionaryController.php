@@ -140,7 +140,7 @@ class DictionaryController extends Controller
         $word = $model->word;
         $model->delete();
         Yii::$app->getSession()->setFlash('success',$model->word." was deleted");
-        return $this->redirect(['index']);
+        return $this->goBack();
     }
 
     /**
