@@ -54,7 +54,7 @@ class UploadController extends Controller{
                 $ftp->connect($setting->ftp_host);
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
                 $ftp->pasv(true);
-                
+                \yii\helpers\FileHelper::createDirectory("uploads/temp/");
                 foreach ($m_album->files as $file) {
                     $media = new Media;
                     $media->updateFileDate();
