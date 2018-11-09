@@ -8,7 +8,7 @@ use yii\helpers\Url;
 $isGuest = Yii::$app->user->isGuest;
 $resultModel = $dataProvider->getModels();
 for($i=0; $i < count($resultModel); $i++){
-    $mediaModel = \app\models\Media::find()->where(['album_id'=>$resultModel[$i]['id']])->limit(4);
+    $mediaModel = \app\models\Media::find()->where(['album_id'=>$resultModel[$i]['id']])->orderBy("RAND()")->limit(4);
     if($isGuest)$mediaModel->andWhere(['is_public'=>1]);
     $mediaModel = $mediaModel->all();
     $resultModel[$i]['media'] = $mediaModel;
