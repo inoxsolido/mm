@@ -1,7 +1,0 @@
-.progress { position:relative; width:400px; border: 1px solid #ddd; padding: 1px; border-radius: 3px; }
-.bar { background-color: #0a4cff; width:0%; height:20px; border-radius: 3px; }
-.percent { position:absolute; display:inline-block; top:0px; left:48%; }
-
-.bar { background-color: #0aff4c; width:0%; height:20px;border:none }
-.percent { position:absolute; display:inline-block; top:0px; left:48%; color:white; font-weight: bold; border-color: #51ff80; border-radius: 3px; }
-.progress {border:none;};

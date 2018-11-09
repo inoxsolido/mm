@@ -7,7 +7,7 @@ use yii\web\AssetBundle;
 
 class JqueryFormAsset extends AssetBundle
 {
-    public $sourcePath = '@webroot/lib/jqueryform';
+    public $sourcePath = '@webroot/lib/jquery_form';
     public $css = [
         'progressbar.css',
     ];

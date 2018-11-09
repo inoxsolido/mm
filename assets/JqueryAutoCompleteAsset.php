@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
  * @author Bravo
  */
 class JqueryAutoCompleteAsset extends AssetBundle {
-    public $sourcePath = '@webroot/lib/jqueryautocomplete';
+    public $sourcePath = '@webroot/lib/jquery_autocomplete';
     public $css = [
         'jquery-ui.min.css',
     ];

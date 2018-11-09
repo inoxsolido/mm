@@ -13,7 +13,7 @@ use yii\web\AssetBundle;
 
 class JqueryTagboxAsset extends AssetBundle
 {
-    public $sourcePath = '@webroot/lib/jquerytagbox';
+    public $sourcePath = '@webroot/lib/jquery_tagbox';
     public $css = [
         'css/jquery.tagbox.css',
     ];
