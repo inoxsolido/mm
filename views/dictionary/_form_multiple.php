@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use richardfan\widget\JSRegister;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Dictionary */
@@ -21,3 +22,13 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+<?php $js = <<< JS
+
+    $(function(){
+        $("#w0").on("afterValidate", function (event, attribute, messages, deferreds){
+            if(attribute.length)$("#loading").show();
+        });
+    });
+
+JS;
+$this->registerJs($js);
