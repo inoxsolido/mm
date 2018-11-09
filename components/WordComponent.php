@@ -26,18 +26,20 @@ class WordComponent extends Component
      * @return array of words with lower case
      */
     public function split($subject){
-        $start = microtime(true);
+//        $start = microtime(true);
         if(!$subject) return [];
         else $subject = strtolower ($subject);
         
-        $dictionary = \app\models\Dictionary::find()->select(['word', 'length'])->orderBy(['length'=>SORT_DESC])->asArray()->all();
+        $len = mb_strlen($subject);
+        
+        $dictionary = \app\models\Dictionary::find()->select(['word', 'length'])->orderBy(['length'=>SORT_DESC])->where(['<=','length',$len])->asArray()->all();
         $match_result = [];
-        $time_elapsed_secs = microtime(true) - $start;
-        print_r($time_elapsed_secs);
+//        $time_elapsed_secs = microtime(true) - $start;
+//        print_r($time_elapsed_secs);
         foreach ($dictionary as $word){
             $length = $word['length'];
             $pos = strpos($subject, $word['word']);
-            if(!$pos) continue;
+            if($pos === FALSE) continue;
             else{
                 $replacement = str_repeat('/', $length);
                 $subject = $this->mb_str_replace($word['word'], $replacement, $subject, 2);
@@ -51,7 +53,7 @@ class WordComponent extends Component
         $mismatch_result = [];
         preg_match_all('/[a-zA-Z0-9]|[ก-เแ-๙]+/', $subject, $mismatch_result, PREG_OFFSET_CAPTURE);
         if($mismatch_result) $mismatch_result = $mismatch_result[0];//remove array dimension
-        print_r($mismatch_result);
+//        print_r($mismatch_result);
         $merged_result = array_merge($match_result,$mismatch_result);
         uasort($merged_result, function($a,$b){ return $a[1]-$b[1]; });//sort result by index ASC
         

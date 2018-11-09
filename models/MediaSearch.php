@@ -30,7 +30,6 @@ class MediaSearch extends Media {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
     /**
      * Creates data provider instance with search query applied
      *
@@ -38,8 +37,7 @@ class MediaSearch extends Media {
      *
      * @return SqlDataProvider
      */
-    public function search($params) {
-
+    public function search($params){
         if(@$params['q'] != null){
             $params['q'] = trim($params['q']);
             $params['q'] = preg_replace('/[~!@#$%^&*()_+\/\-*\/\.,\?\[\]\|:;"\'\\\\<>\{\}]/', '', $params['q']);
@@ -48,6 +46,7 @@ class MediaSearch extends Media {
         
         $draftQuery = new \yii\db\Query();
         $draftQuery->select("media.*, album.name as album_name, album.tags as album_tags")->from("media");
+        $draftQuery->leftJoin('album', 'album.id = album_id');
         $type = [];
         if(@$params['v']==1)$type[]=1;
         if(@$params['i']==1)$type[]=2;
@@ -62,129 +61,103 @@ class MediaSearch extends Media {
             $date_range = explode(' - ', $params['dr']);
             $draftQuery->andWhere(['BETWEEN', 'file_upload_date', $date_range[0], $date_range[1]]);
         }
-        
-        if (@$params['oAlbum'] && $splited_q != []) {
-            $draftQuery->innerJoin('album', 'album.id = album_id');
-            
-            $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
-            $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
-            $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
-            $query4 = clone $draftQuery; //5. มีคำที่เกี่ยวข้องอยู่ตรงไหนของRecordก็ได้
-
-            
-            $pattern1 = ''; //for $query2
-//            $pattern2 = ''; //for $query3
-            $pattern3 = ''; //for $query4
-            $pattern4 = ''; //for $query5
-            if ($splited_q != []) {
-                $pattern1 = '^.*' . join('.*', $splited_q) . '.*$';
-                //pattern2 & query3
-                foreach ($splited_q as $v) {
-                    $query3->andWhere(['or', 
-                        ['like', 'album.name', $v],
-                        ['like', 'album.tags', $v]
-                    ]);
-                }
-                $pattern3 = '^.*' . join('|', $splited_q) . '.*$';
-                if ($params['related_word'] != []){
-                    $pattern4 = '^.*' . join('|', $params['related_word']) . '.*$'; //รอ
-                    $query4->andWhere(['or',
-                        ['REGEXP', 'album.name', $pattern4],
-                        ['REGEXP', 'album.tags', $pattern4]
-                    ]);
-                }
-            }
-            $query1->andWhere(['or',
-                ['like', 'album.name', $params['q']],
-                ['like', 'album.tags', $params['q']]
+        if($splited_q == []){ //search only by type date and publish condition
+            $final_sql = $draftQuery->createCommand()->getRawSql();
+            $count = $draftQuery->count();
+            $dataProvider = new SqlDataProvider([
+                'sql' => $final_sql,
+                'totalCount' => $count,
+                'pagination' => [
+                    'pageParam' => 'p',
+                    'pageSize' => 12,
+                    'pageSizeParam' => false,
+                ],
             ]);
-            $query2->andWhere(['or',
-                ['REGEXP', 'album.name', $pattern1],
-                ['REGEXP', 'album.tags', $pattern1],
-            ]);
-            
-            
-
-            $final_query = $query1->union($query2)
-                    ->union($query3)
-//                    ->union($query4)
-                    ;
-            if($pattern4!=''){
-                $final_query->union($query5);
-            }
-
-        } else {
-            $draftQuery->leftJoin('album', 'album.id = album_id');
-
-            if ($splited_q != []) {
-
-
-                $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
-                $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
-                $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
-                $query4 = clone $draftQuery; //4. มีคำบางคำและคำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (Or condition)
-                $query5 = clone $draftQuery; //5. มีคำที่เกี่ยวข้องอยู่ตรงไหนของRecordก็ได้
-
-                $pattern1 = ''; //for $query2
-//            $pattern2 = ''; //for $query3
-                $pattern3 = ''; //for $query4
-                $pattern4 = ''; //for $query5
-                if ($splited_q != []) {
-                    $pattern1 = '^.*' . join('.*', $splited_q) . '.*$';
-
-//                $pattern2 = '^.*'; //start p2
-                    foreach ($splited_q as $v) {
-                        $query3->andWhere(['or',
-                            ['like', 'media.name', $v],
-                            ['like', 'media.tags', $v],
-                            ['like', 'album.name', $v],
-                            ['like', 'album.tags', $v]
-                        ]);
-                    }
-
-                    $pattern3 = '^.*' . join('|', $splited_q) . '.*$';
-                    if ($params['related_word'] != [])
-                        $pattern4 = '^.*' . join('|', $params['related_word']) . '.*$'; //รอ
-                }
-
-                $query1->andWhere(['or',
-                    ['like', 'media.name', $params['q']],
-                    ['like', 'media.tags', $params['q']],
-                    ['like', 'album.name', $params['q']],
-                    ['like', 'album.tags', $params['q']]
-                ]);
-                $query2->andWhere(['or',
-                    ['REGEXP', 'media.name', $pattern1],
-                    ['REGEXP', 'media.tags', $pattern1],
-                    ['REGEXP', 'album.name', $pattern1],
-                    ['REGEXP', 'album.tags', $pattern1]
-                ]);
-                $query4->andWhere(['or',
-                    ['REGEXP', 'media.name', $pattern3],
-                    ['REGEXP', 'media.tags', $pattern3],
-                    ['REGEXP', 'album.name', $pattern3],
-                    ['REGEXP', 'album.tags', $pattern3]
-                ]);
-                $query5->andWhere(['or',
-                    ['REGEXP', 'media.name', $pattern4],
-                    ['REGEXP', 'media.tags', $pattern4],
-                    ['REGEXP', 'album.name', $pattern4],
-                    ['REGEXP', 'album.tags', $pattern4]
-                ]);
-
-
-                $final_query = $query1->union($query2)
-                        ->union($query3)
-//                        ->union($query4)
-                        ;
-                if ($pattern4 != '') {
-                    $final_query->union($query5);
-                }
-            }else{
-                $final_query = $draftQuery;
-            }
+            return $dataProvider;
         }
+        //keyword search
+            
+        $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
+        $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
+        $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
+        $query4 = clone $draftQuery; //4. มีคำที่เกี่ยวข้องอยู่ตรงไหนของRecordก็ได้
+        
+        $condition_1 = ['or'];
+        
+        $condition_2 = ['or'];
+        $pattern1 = '^.*' . join('.*', $splited_q) . '.*$'; //result: /^.*word1.*word2.*$/
+        
+        foreach ($splited_q as $v) {
+            $condition_3 = ['or'];
+            if(@$params['omedianame']){
+                array_push($condition_3, ['like', 'media.name', $v]);
+            }
+            if(@$params['omediatag']){
+                array_push($condition_3, ['like', 'media.tags', $v]);
+            }
+            if(@$params['oalbumname']){
+                array_push($condition_3, ['like', 'album.name', $v]);
+            }
+            if(@$params['oalbumtag']){
+                array_push($condition_3, ['like', 'album.tags', $v]);
+            }
+            $query3->andWhere( 
+                $condition_3
+            );
+        }
+            
+        $condition_4 = ['or'];
+        
 
+        if(@$params['omedianame']){
+            array_push($condition_1, ['like', 'media.name', $params['q']]);
+            array_push($condition_2, ['REGEXP', 'media.name', $pattern1]);
+        }
+        if(@$params['omediatag']){
+            array_push($condition_1, ['like', 'media.tags', $params['q']]);
+            array_push($condition_2, ['REGEXP', 'media.tags', $pattern1]);
+        }
+        if(@$params['oalbumname']){
+            array_push($condition_1, ['like', 'album.name', $params['q']]);
+            array_push($condition_2, ['REGEXP', 'album.name', $pattern1]);
+        }
+        if(@$params['oalbumtag']){
+            array_push($condition_1, ['like', 'album.tags', $params['q']]);
+            array_push($condition_2, ['REGEXP', 'album.tags', $pattern1]);
+        }
+        $query1->andWhere(
+            $condition_1
+        );
+        $query2->andWhere(
+            $condition_2
+        );
+        
+        $final_query = $query1->union($query2)->union($query3);
+        
+        //query4
+        $related_word = FrequencyRelation::getRelatedWord($params['q']);
+        if (!empty($related_word)){
+            $pattern2 = '^.*' . join('|', $related_word) . '.*$';
+            
+            if(@$params['omedianame']){
+                array_push($condition_4, ['REGEXP', 'media.name', $pattern2]);
+            }
+            if(@$params['omediatag']){
+                array_push($condition_4, ['REGEXP', 'media.tags', $pattern2]);
+            }
+            if(@$params['oalbumname']){
+                array_push($condition_4, ['REGEXP', 'album.name', $pattern2]);
+            }
+            if(@$params['oalbumtag']){
+                array_push($condition_4, ['REGEXP', 'album.tags', $pattern2]);
+            }
+            
+            $query4->andWhere(['or',
+                $condition_4
+            ]);
+            $final_query->union($query4);
+        }
+        
         $final_sql = $final_query->createCommand()->getRawSql();
         $count = $final_query->count();
         $dataProvider = new SqlDataProvider([
@@ -198,6 +171,8 @@ class MediaSearch extends Media {
         ]);
         return $dataProvider;
     }
+    
+    
 
     /**
      * Creates data provider instance with search query applied

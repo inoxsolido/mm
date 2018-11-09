@@ -211,6 +211,17 @@ class Media extends \yii\db\ActiveRecord
         return $setting->ftp_part.$this->file_thumbnail_path;
     }
     
+    public static function generateThumbnailHttp($path,$setting){
+        if(!$setting) $setting = Settings::getSetting();
+        return 'http://'.$setting->ftp_host.$setting->http_part.'/'.$path;
+    }
+    
+    public static function generateFileHttp($path, $fileName, $extension, $setting){
+        if(!$setting) $setting = Settings::getSetting();
+        return 'http://'.$setting->ftp_host.$setting->http_part.'/'.$path.'/'.$fileName.$extension;
+    }
+
+
     /**
      * Deletes the table row corresponding to this active record.
      *

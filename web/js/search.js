@@ -75,7 +75,7 @@ $(window).load(function () {
                 return;
             }
             $.ajax({
-                url: "suggest-word",
+                url: window.url_suggest_word,
                 type: "post",
                 dataType: "json",
                 data: {
@@ -99,7 +99,9 @@ $(window).load(function () {
     
     $(".check-type").change(function(){
         if($(".check-type:checked").length === 0) $(".check-type").prop({checked:true});
-        console.log('check-type fire');
+    });
+    $(".check-search").change(function(){
+        if($(".check-search:checked").length === 0) $(".check-search").prop({checked:true});
     });
     
     function createQueryParameter(page) {
@@ -209,7 +211,11 @@ $(window).load(function () {
             $('.check-type:first').change();
             $('[name=dr]').val(getQuery('dr')).change();
             $("#w0-container").find(".range-value").html($('[name=dr]').val());
-            $('[name=onlyAlbum]').prop({checked:getQuery('onlyAlbum')==='only'?true:false});
+            $('[name=omedianame]').prop({checked:getQuery('omedianame')==='1'?true:false});
+            $('[name=omediatag]').prop({checked:getQuery('omediatag')==='1'?true:false});
+            $('[name=oalbumname]').prop({checked:getQuery('oalbumname')==='1'?true:false});
+            $('[name=oalbumtag]').prop({checked:getQuery('oalbumtag')==='1'?true:false});
+            $('.check-search:first').change();
         }
         //clear old event & binding new
         $(".section-content").off();

@@ -70,8 +70,13 @@ $currentDateTime = date("Y-m-d h:i A");
                 </div>
             </div><br/>
             <div class="form-group row no-margin">
-                <div class="col-md-12">
-                    <label for="oAlbum" class=""><input type="checkbox" id="oAlbum" name="onlyAlbum" value="only" />&nbsp;&nbsp;&nbsp;ค้นหาเฉพาะอัลบั้ม</label>
+                <div class="col-md-6">
+                    <label for="omedianame" class=""><input class="check-search" type="checkbox" checked="checked" id="omedianame" name="omedianame" value="1" />&nbsp;&nbsp;&nbsp;ค้นหาจากชื่อไฟล์</label><br/>
+                    <label for="omediatags" class=""><input class="check-search" type="checkbox" checked="checked" id="omediatag" name="omediatag" value="1" />&nbsp;&nbsp;&nbsp;ค้นหาจาก Tag ไฟล์</label><br/>
+                </div>
+                <div class="col-md-6">
+                    <label for="oalbumname" class=""><input class="check-search" type="checkbox" checked="checked" id="oalbumname" name="oalbumname" value="1" />&nbsp;&nbsp;&nbsp;ค้นหาจากชื่ออัลบั้ม</label><br/>
+                    <label for="oalbumtag" class=""><input class="check-search" type="checkbox" checked="checked" id="oalbumtag" name="oalbumtag" value="1" />&nbsp;&nbsp;&nbsp;ค้นหาจาก Tag อัลบั้ม</label>
                 </div>
             </div>
         </div>

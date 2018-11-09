@@ -3,7 +3,9 @@
 /* @var $setting \app\models\Settings */
 use yii\helpers\Html;
 use richardfan\widget\JSRegister;
+use yii\helpers\Url;
 app\assets\JqueryAutoCompleteAsset::register($this);
+\app\assets\PlyrAsset::register($this);
 ?>
 <div class="search-main">
     <center>
@@ -139,7 +141,6 @@ $(window).load(function () {
     
     $(".check-type").change(function(){
         if($(".check-type:checked").length === 0) $(".check-type").prop({checked:true});
-        console.log('check-type fire');
     });
     
     function createQueryParameter(page) {
@@ -149,7 +150,6 @@ $(window).load(function () {
          * date => '2018-05-24 12:00 AM - 2018-05-24 11:59 PM',
          * onlyAlbum => 'only', */
         let form_var = $("#search").serializeArray();
-        console.log(page);
         if (!page && page !== 0)
             page = 1;
         form_var.push({name: 'p', value: page});
@@ -160,7 +160,6 @@ $(window).load(function () {
     
     var queryCache = {};
     $("#query").bind("keydown", function() {
-        console.log($(this).val());
         var regex = /^[a-zA-Z0-9ก-๙ ]+$/;
         if (regex.test($(this).val()) || $(this).val() == '') {
             queryCache[$(this).attr("id")] = $(this).val();
@@ -168,9 +167,7 @@ $(window).load(function () {
         
     });
     $("#query").bind("keyup", function() {
-        console.log($(this).val());
         var regex = /^[a-zA-Z0-9ก-๙ ]+$/;
-        console.log((!regex.test($(this).val())));
         if (!(regex.test($(this).val()) || $(this).val() == '')) {
             $(this).val(queryCache[$(this).attr("id")]);
         }

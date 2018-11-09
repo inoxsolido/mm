@@ -1,5 +1,6 @@
 <?php 
 use app\components\CustomLinkPager;
+use app\models\Media;
 use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $resultModel Array of \app\models\Media */
@@ -20,9 +21,9 @@ $resultModel = $dataProvider->getModels();
         margin: 0 0 30px 0
     }
     
-    .content-list > div > a > img{
+    .content-list > div > img{
         float:left;
-        max-width:200px
+        width:200px
     }
     .content-list > .row > .caption{
         float:right;
@@ -70,9 +71,14 @@ $resultModel = $dataProvider->getModels();
         <?php else: ?>
         <?php foreach($resultModel as $model): ?>
         <div class="row">
-            <a href="#"><img class="pull-left" src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" /></a>
+            <img class="pull-left" src="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" />
             <span class="caption pull-left">
-                <a class="title" href="#"><?=$model['name']?></a>
+                <a class="previewable title" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 
+                   data-tags="<?= $model['tags'] ?>" 
+                   data-album_name="<?= $model['album_name'] ?>" data-album_link="<?= Url::to(['/album/view','id'=>$model['album_id']])?>" 
+                   data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
+                   data-type="<?=$model['media_type_id']?>" 
+                   data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>"><?=$model['name']?></a>
                 <p class="detail">
                     <?php if($model['album_id']):?>
                     From Album: <a href="<?= Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a>
@@ -95,11 +101,31 @@ $resultModel = $dataProvider->getModels();
         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
             <div class="thumbnail">
                 <div class="thumbnail-img">
-                <a href="#"><img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" alt=""/></a>
+                    <a class="previewable" data-id="<?=$model['id']?>" 
+                       data-tags="<?= $model['tags'] ?>" 
+                       data-name="<?= $model['name'] ?>" 
+                       data-album_name="<?= $model['album_name'] ?>" 
+                       data-album_link="<?= Url::to(['/album/view','id'=>$model['album_id']])?>" 
+                       data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
+                       data-type="<?=$model['media_type_id']?>" 
+                       data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" 
+                       href="#<?=$model['id']?>">
+                        <img src="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" alt=""/>
+                    </a>
                 </div>
                 <div class="caption">
-                    <h4><a href="#"><?=$model['name']?></a></h4>
+                    <h4><a class="previewable" data-id="<?=$model['id']?>" 
+                           data-tags="<?= $model['tags'] ?>" 
+                           data-name="<?= $model['name'] ?>" 
+                           accesskey=""data-album_name="<?= $model['album_name'] ?>" 
+                           contenteditable=""data-album_link="<?= Url::to(['/album/view','id'=>$model['album_id']])?>" 
+                           data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
+                           data-type="<?=$model['media_type_id']?>" 
+                           data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" 
+                           href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
+                    <?php if($model['album_id']):?>
                     <p>Album: <a href="<?=Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a></p>
+                    <?php endif; ?>
                     <p>Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?></p>
                 </div>
             </div>

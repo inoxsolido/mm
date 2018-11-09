@@ -21,7 +21,6 @@ for($i=0; $i < count($resultModel); $i++){
     }
     .thumbnail > .thumbnail-img > a > img {
         height: 200px;
-        max-width:fit-content;
     }
     
     .content-list > .row {
@@ -99,10 +98,8 @@ for($i=0; $i < count($resultModel); $i++){
                 <?php endforeach; ?>
             </a>
             <span class="caption pull-left">
-                <a class="title" href="#"><?=$model['name']?></a>
-                <p class="detail">
-                    <span>Tag: <?php foreach($tags as $tag): ?><a href="#"><?=$tag?></a>&nbsp;<?php endforeach; ?></span>
-                </p>
+                <a class="title" href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a>
+                <p><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
             </span>
             
         </div>
@@ -120,7 +117,7 @@ for($i=0; $i < count($resultModel); $i++){
         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
             <div class="thumbnail">
                 <div class="thumbnail-img thumbnail-slide-container">
-                    <a href="#">
+                    <a href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>">
                         <?php foreach($model['media'] as $media): ?>
                         <?php /* @var $media \app\models\Media */ ?>
                         <img class="pull-left thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
@@ -128,8 +125,8 @@ for($i=0; $i < count($resultModel); $i++){
                     </a>
                 </div>
                 <div class="caption">
-                    <h4><a href="#"><?=$model['name']?></a></h4>
-                    <p><span>Tag: <?php foreach($tags as $tag): ?><a href="#"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
+                    <h4><a href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a></h4>
+                    <p><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
                 </div>
             </div>
         </div>

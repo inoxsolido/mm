@@ -1,20 +1,8 @@
 <?php
-/* @var $this \yii\web\View */
-/* @var $mediaDataProver \yii\data\ActiveDataProvider */
-/* @var $album \app\models\Album */
-use app\components\CustomLinkPager;
-use yii\widgets\DetailView;
-use yii\helpers\Html;
-use yii\helpers\Url;
-use app\models\Media;
 use richardfan\widget\JSRegister;
-
+/* @var $this yii\web\View */
+use yii\helpers\Url;
 \app\assets\PlyrAsset::register($this);
-
-$mediaModel = $mediaDataProvider->getModels();
-$this->title = $album->name;
-//$this->params['breadcrumbs'][] = ['label' => 'Album', 'url' => ['index']];
-//$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div id="player-backdrop" class="player-back-drop" style="display:none;"></div>
@@ -61,41 +49,6 @@ $this->title = $album->name;
         </div>
     </div>
 </div>
-<h1><?= Html::encode($this->title) ?></h1>
-
-<!--Media-->
-<div class="content-table row" style="">
-    <?php if(!$mediaModel):?>
-    <div style="text-align:center"><span class="text-info">No media found.</span></div>
-    <?php else: ?>
-    <?php foreach($mediaModel as $model): ?>
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
-        <div class="thumbnail">
-            <div class="thumbnail-img">
-                <a class="previewable poster" data-id="<?=$model['id']?>" data-tags="<?= $model['tags'] ?>" data-name="<?= $model['name'] ?>" data-album_name="" data-album_link="" data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" data-type="<?=$model['media_type_id']?>" data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>">
-                    <img src="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" alt=""/>
-                </a>
-            </div>
-            <div class="caption">
-                <h4><a class="previewable" data-id="<?=$model['id']?>" data-tags="<?= $model['tags'] ?>" data-name="<?= $model['name'] ?>" data-album_name="" data-album_link="" data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" data-type="<?=$model['media_type_id']?>" data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
-                <p>Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?></p>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
-
-    <?php endif; ?>
-</div>
-
-<?php 
-    echo CustomLinkPager::widget([
-        'pagination' => $mediaDataProvider->getPagination(),
-        'linkOptions'=>['class'=>'btn-page'],
-        'hideOnSinglePage' => false,
-        'template' => ' <div class="content-page-number row"><center><nav aria-label="Page navigation"><pager/></nav></center></div>'
-    ]);
-?>
-
 <?php JSRegister::begin(['position'=> \yii\web\View::POS_READY]); ?>
 <script>
     window.url_suggest_word = "<?=Url::to(['search/suggest-word'])?>";
