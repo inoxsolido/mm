@@ -225,6 +225,7 @@ $this->title = $album->name;
         }
     });
     $("#player").on("click", ".player-close", function(){
+        $("#player").find(".player-media-wrapper").html('');
         $("#player-backdrop").hide();
         $("#player").hide();
         window.location.hash = "";

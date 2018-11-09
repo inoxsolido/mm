@@ -198,6 +198,7 @@ $this->registerJsFile("@web/js/search.js",  ['depends' => [\yii\web\JqueryAsset:
         }
     });
     $("#player").on("click", ".player-close", function(){
+        $("#player").find(".player-media-wrapper").html('');
         $("#player-backdrop").hide();
         $("#player").hide();
         window.location.hash = "";

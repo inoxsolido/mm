@@ -280,6 +280,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     });
     $("#player").on("click", ".player-close", function(){
+        $("#player").find(".player-media-wrapper").html('');
         $("#player-backdrop").hide();
         $("#player").hide();
         window.location.hash = "";
