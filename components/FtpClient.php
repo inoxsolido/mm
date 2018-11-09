@@ -7,7 +7,7 @@
  */
 namespace app\components;
 
-class FTPClient extends \yii2mod\ftp\FtpClient
+class FtpClient extends \yii2mod\ftp\FtpClient
 {
     public function make_directory($dir)
     {
