@@ -67,6 +67,7 @@ class FrequencyRelation extends \yii\db\ActiveRecord
      * @return array Empty array is returned if the results is nothing.
      */
     public static function getRelatedWord($query, $setting=''){
+        if($query == '')return null;
         if($setting == '') $setting = Settings::getSetting();
         $freg_relation_rate = $setting->frequency_relation_rate;
         $related_word = [];
