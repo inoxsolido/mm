@@ -47,7 +47,9 @@ class AlbumSearch extends Album
         $draftQuery->orderBy(['name' => SORT_ASC]);
         $final_query = $draftQuery;
         if ($splited_q != []) {
-
+            //update frequency word
+            Yii::$app->word->frequencyWordToDictionary($query);
+            
             $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
             $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
             $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
@@ -82,8 +84,8 @@ class AlbumSearch extends Album
                 ]);
                 $final_query->union($query4);
             }
- 
         }
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $final_query,
             'pagination' => [

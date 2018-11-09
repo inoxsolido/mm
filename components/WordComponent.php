@@ -3,21 +3,48 @@
 namespace app\components;
 
 use yii\base\Component;
+use app\models\Settings;
+use app\models\FrequencyWord;
+use app\models\Dictionary;
 
 class WordComponent extends Component
 {
 
     /**
-     * This method use to update Dictionary
+     * This method use to update frequency word's counter and add to Dictionary
+     * @param string $word query word
+     * @param \app\models\Settings $setting  Site settings object
      * @return boolean
      */
-    public function frequencyWordToDictionary()
+    public function frequencyWordToDictionary($word, $setting=null)
     {
-
-        //retrive frequency_rate from settings
-
-
-        return true;
+        if($word == '') return false;
+        if($setting == null) $setting = Settings::getSetting();
+        
+        $dictionaryModel = Dictionary::find()->where(['word'=>$word])->one();
+        if($dictionaryModel) return false; //reject if exist in Dictionary
+        $wordModel = FrequencyWord::find()->where(['word'=>$word])->one();
+        if($wordModel === null){ 
+            $wordModel = new FrequencyWord();
+            $wordModel->word = $word;
+            $wordModel->frequency = 1;
+            $result = $wordModel->save();
+            if(!$result) return false; //reject if fail on saving
+        }
+        if(!$wordModel->updateCounters(['frequency'=>1])) return true;
+        
+        if($wordModel->frequency >= $setting->frequency_word_rate){
+            if($dictionaryModel === null){
+                $dictionaryModel = new Dictionary();
+                $length = mb_strlen($wordModel->word);
+                $dictionaryModel->word = $wordModel->word;
+                $dictionaryModel->length = $length;
+                if(!$dictionaryModel->save()) return false; //reject if fail on saving
+            }
+            return $wordModel->delete();
+        }
+        return false; //reject if fail on updating counter
+        
     }
 
     /**

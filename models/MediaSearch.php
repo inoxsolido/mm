@@ -75,8 +75,10 @@ class MediaSearch extends Media {
             ]);
             return $dataProvider;
         }
-        //keyword search
-            
+        //-----keyword search
+        //update frequency word
+        Yii::$app->word->frequencyWordToDictionary($q);//update
+        
         $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
         $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
         $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)
