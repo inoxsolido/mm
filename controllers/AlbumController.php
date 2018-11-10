@@ -284,8 +284,6 @@ class AlbumController extends Controller
 
                 $deleteResult = Media::deleteAll(['album_id'=>$album->id]);
 
-                if ($deleteResult && !@$ftp->remove($directory))
-                    throw new \Exception("Ftp remove Error");
             }
             $album_name = $album->name;
             $album->delete();
