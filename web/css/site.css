@@ -322,6 +322,7 @@ html, body{
  .player-tag > a {
      color:white;
      text-decoration: underline;
+     margin-right:5px;
  }
  .player-download{
      width:10%;
