@@ -8,6 +8,7 @@ use app\models\FrequencyWordSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * WordController implements the CRUD actions for FrequencyWord model.
