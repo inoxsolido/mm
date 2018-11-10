@@ -27,10 +27,10 @@ class SearchController extends Controller {
                 'except'=> ['index', 'search', 'suggest-word', 'album'],
                 'rules' => [
                     [
-                        'allow'=>false,
+                        'allow'=>true,
                         'actions' => ['directory'],
-                        'roles' => ['?']
-                    ],                           
+                        'roles' => ['@']
+                    ],
                 ],
             ]
         ];
@@ -124,10 +124,10 @@ class SearchController extends Controller {
         $ftp->pasv(true);
         try{
             $list = $ftp->scanDir($setting->ftp_part.$path);
-            return $this->render('directory', ['list'=>$list, 'path'=>$path]);
         } catch (\Exception $ex) {
             throw new \yii\web\HttpException('404', 'Page not found.');
         }
+        return $this->render('directory', ['list'=>$list, 'path'=>$path, 'setting'=>$setting]);
         
         
     }
