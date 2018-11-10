@@ -145,7 +145,8 @@ class Media extends \yii\db\ActiveRecord
 
     public function getNewFileName($is_new_record = true, $file_path=""){
         if($file_path) $this->file_path = $file_path;
-        $new_file_name = $this->name;
+//        $new_file_name = $this->name;
+        $new_file_namestr_replace("#","",$this->name);
         $last_record = $is_new_record?
             Media::find()
                 ->select(["file_path", "file_upload_date", "file_name","name", "id"])
