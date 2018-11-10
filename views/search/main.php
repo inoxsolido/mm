@@ -114,7 +114,6 @@ $this->registerJsFile("@web/js/search.js",  ['depends' => [\yii\web\JqueryAsset:
         let album_name = $(this).data('album_name');
         let album_link = $(this).data('album_link');
         let name = $(this).data('name');
-        let this_context = $(this).context;
         let $previewable = $(selector);
         var media_set = [];//reset
         //get position
@@ -182,7 +181,7 @@ $this->registerJsFile("@web/js/search.js",  ['depends' => [\yii\web\JqueryAsset:
             $(".player-right").show();
         }
         $("#player").find(".player-media-wrapper").html(mediaElement);
-        $(".player-download > a").eq(0).attr({href:full_link});
+        $(".player-download > a").eq(0).attr({href:full_link, target:"_blank"});
         $("#player-backdrop").show();
         $("#player").show();
         Plyr.setup("#media-player", controls);

@@ -1,6 +1,7 @@
 <?php 
 use yii\helpers\Url;
 /* @var $setting \app\models\Settings */
+/* @var $ftp \app\components\FtpClient */
 ?>
 
 <style>
@@ -46,28 +47,18 @@ use yii\helpers\Url;
 </div>
 </a>
 <?php endif; ?>
-<?php foreach ($list as $item): 
-    $extension = explode('.', $item['name']);
-    $c = count($extension);
-    if($c>0){
-        $item['extension'] = $extension[($c-1)];
-        $item['name'] = str_replace(".".$item['extension'], "", $item['name']);
-    }
-    else
-        $temp['extension'] = '';
-?>
+<?php foreach ($list as $item): ?>
 <?php if($item['type']=='directory'): ?>
 <a href="<?=Url::current(['path'=>$path.'/'.$item['name']])?>">
 <?php else: ?>
-<a href="http://<?="{$setting->ftp_host}/{$setting->http_part}/{$path}/{$item['name']}.{$item['extension']}"?>"> 
+    <a target="_blank" href="http://<?="{$setting->ftp_host}/{$setting->http_part}/{$path}/{$item['name']}"?>"> 
 <?php endif; ?>
 <div class="row highlight">
     <div class="col-sm-3 text-right">
         <?php if($item['type'] == 'directory'): ?>
         <i class="image glyphicon glyphicon-folder-open"></i>
         <?php else: ?>
-<!--        <i class="image glyphicon glyphicon-file"></i>-->
-        <img src="http:///<?="{$setting->ftp_host}/{$setting->http_part}/thumbnails/thumbnail_{$item['name']}.jpeg"?>" style="height:50px;max-width:100px;"/>
+        <i class="image glyphicon glyphicon-file"></i>
         <?php endif; ?>
     </div>
     <div class="col-sm-5 text-left"><?=$item['name']?></div>

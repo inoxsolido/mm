@@ -127,9 +127,7 @@ class SearchController extends Controller {
         } catch (\Exception $ex) {
             throw new \yii\web\HttpException('404', 'Page not found.');
         }
-        return $this->render('directory', ['list'=>$list, 'path'=>$path, 'setting'=>$setting]);
-        
-        
+        return $this->render('directory', ['list'=>$list, 'path'=>$path, 'setting'=>$setting, 'ftp'=>$ftp]);
     }
 
     //ajax suggest-words
