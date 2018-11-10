@@ -84,7 +84,7 @@ Use exist album
                 //'maxFileSize'=>2800
 
             ],
-            'options' => ['accept' => app\models\MediaType::getExtensionAsString(['image']), 'multiple' => true]
+            'options' => ['accept' => app\models\MediaType::getExtensionAsString(['image'],true,true), 'multiple' => true]
         ]) ?>
         <div class="form-group">
             <?= Html::submitButton('Upload', ['id'=>'btnsubmit', 'class' => 'btn btn-primary', 'disabled'=>'disabled']) ?>

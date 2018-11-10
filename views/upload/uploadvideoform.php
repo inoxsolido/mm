@@ -39,7 +39,7 @@ use yii\helpers\Url;
                 //'maxFileSize'=>2800
 
             ],
-            'options' => ['accept'=> app\models\MediaType::getExtensionAsString(['video']) ,'multiple' => false]
+            'options' => ['accept'=> app\models\MediaType::getExtensionAsString(['video'], true, true) ,'multiple' => false]
         ]) ?>
     <div class="file-preview" id="video-preview-box" style="display:none;">
         <div id="close-video-preview" class="close fileinput-remove">×</div>
