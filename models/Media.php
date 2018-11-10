@@ -178,7 +178,7 @@ class Media extends \yii\db\ActiveRecord
             }
             return $new_file_name;
         }
-        return $this->name;
+        return $new_file_name;
 
     }
     public function getThumbnailDecoded(){
