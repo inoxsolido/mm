@@ -44,7 +44,7 @@ class Album extends \yii\db\ActiveRecord
                 'message' => '{attribute} {value} มีอยู่แล้วในระบบ',
                 'on' => 'update',
             ],
-            [['files'], 'file', 'extensions'=>MediaType::getExtensionAsString(['image'])
+            [['files'], 'file', 'extensions'=>MediaType::getExtensionAsString(['image'], false)
                 , 'maxFiles' => 100
             ],
             [['files'], 'required', 'on' => 'create'],

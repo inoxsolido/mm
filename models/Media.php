@@ -70,13 +70,13 @@ class Media extends \yii\db\ActiveRecord
         ];
         //optimizer lowest query
         if($this->scenario === self::SCENARIO_CREATE){
-            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image', false)];
         }else if($this->scenario === self::SCENARIO_UPDATE){
-            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image')];
+            $result[] = [['thumbnail_file'], 'file', 'extensions'=> MediaType::getExtensionAsString('image', false)];
         }else if($this->scenario === self::SCENARIO_VIDEO){
-            $result[] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video'), 'on'=>'video'];
+            $result[] = [['media_file'], 'file', 'extensions'=>MediaType::getExtensionAsString('video', false), 'on'=>'video'];
         }else if($this->scenario === self::SCENARIO_OTHER){
-            $result[] = [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image']), 'on'=>'other'];
+            $result[] = [['media_file'], \app\components\FileExtensionNotInValidator::className(), 'extensions'=>MediaType::getExtensionAsString(['video', 'image'], false), 'on'=>'other'];
         }
         return $result;
     }
