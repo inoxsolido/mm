@@ -77,7 +77,7 @@ class MediaSearch extends Media {
         }
         //-----keyword search
         //update frequency word
-        Yii::$app->word->frequencyWordToDictionary($q);//update
+        Yii::$app->word->frequencyWordToDictionary($params['q']);//update
         
         $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
         $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
