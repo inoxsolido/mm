@@ -16,7 +16,7 @@ $(window).load(function () {
 
     function getCookie(cname) {
         let cookies = document.cookie;
-        let pattern = /(?<name>\w+)=(?<value>\w+)/g;
+        let pattern = /(\w+)=(\w+)/;
         let m = '';
         while ((m = pattern.exec(cookies)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
