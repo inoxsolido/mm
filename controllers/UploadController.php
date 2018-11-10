@@ -10,11 +10,40 @@ use Exception;
 use Yii;
 use yii\web\UploadedFile;
 use yii\helpers\Url;
-
+use yii\filters\AccessControl;
 
 class UploadController extends Controller{
     
-    
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Display Upload Image Form 
+     * @param \app\controllers\type $album
+     * @return string
+     * @throws \yii\web\HttpException
+     * @throws Exception
+     * @throws \yii2mod\ftp\FtpException    
+     * @throws \yii\web\HttpException
+     * @throws Exception
+     * @throws \yii2mod\ftp\FtpException 
+     */
     public function actionImage($album){
         $m_album = new Album;
         $m_album->scenario = Album::SCENARIO_CREATE;
@@ -61,7 +90,7 @@ class UploadController extends Controller{
                     $media->album_id = $m_album_id;
                     $media->name = preg_replace('/\.\w+$/', '', $file->name);//remove file extension
                     //Check Extension In MediaType
-//                    $mediaType = MediaType::find()->where(['LIKE', 'extension', $file->file_extension])->one();
+
                     $media->media_type_id = 2; //fixed by user
                     //                  Type/Album name
                     $media->file_path = $media->mediaType->name . '/' . $m_album->name;
@@ -128,10 +157,10 @@ class UploadController extends Controller{
                     'model' => $m_album, 'getAlbum' => $getAlbum, 'list_album' => $list_album_name
         ]);
     }
-    
-    
-    
-    
+    /**
+     * Display Upload Video Form
+     * @return mixed
+     */
     public function actionVideo(){
         $model = new Media();
         $model->scenario = 'video';
@@ -221,7 +250,10 @@ class UploadController extends Controller{
         }
     }
 
-    
+    /**
+     * Display General Upload Form for Other file type except Video and Image
+     * @return mixed
+     */
     public function actionOther(){
         $model = new Media(['scenario'=>Media::SCENARIO_OTHER]);
         $model->scenario = Media::SCENARIO_OTHER;

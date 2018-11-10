@@ -3,18 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\MediaType;
 use app\models\Settings;
 use app\models\Media;
 use app\models\MediaSearch;
 use app\models\Album;
-use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Response;
 use yii\web\UploadedFile;
+use yii\filters\AccessControl;
 
 /**
  * MediaController implements the CRUD actions for Media model.
@@ -33,9 +31,23 @@ class MediaController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-
+                    'delete'=>['POST']
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'media-edit', 'delete'],
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->identity->getIsAdmin();
+                        }
+                    ],                            
+                ],
+            ]
         ];
     }
 
@@ -69,7 +81,7 @@ class MediaController extends Controller
         } else {
             if (Yii::$app->request->isPost) {
                 $model->load(Yii::$app->request->post());
-                $setting = \app\models\Settings::getSetting();
+                $setting = Settings::getSetting();
                 $old_file_path_full = $model->getFtpPath($setting);
                 $old_file_thumbnail_path_full = $model->getThumbnailFtpPath($setting);
                 $isNameChanged = $model->isAttributeChanged('name');
@@ -151,7 +163,11 @@ class MediaController extends Controller
         }
     }
 
-    //not complete
+    /**
+     * Post to delete Media by given id
+     * @param integer $id
+     * @return mixed redirect to index
+     */
     public function actionDelete($id){
         $media = $this->findModel($id);
         //backup file path and thumbnail path

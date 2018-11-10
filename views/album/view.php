@@ -209,6 +209,7 @@ $this->title = $album->name;
             $(".player-right").show();
         }
         $("#player").find(".player-media-wrapper").html(mediaElement);
+        $(".player-download > a").eq(0).attr({href:full_link});
         $("#player-backdrop").show();
         $("#player").show();
         Plyr.setup("#media-player", controls);

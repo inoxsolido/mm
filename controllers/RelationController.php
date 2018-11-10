@@ -8,6 +8,7 @@ use app\models\FrequencyRelationSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * RelationController implements the CRUD actions for FrequencyRelation model.
@@ -26,6 +27,25 @@ class RelationController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'roles' => ['@']
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->identity->getIsAdmin();
+                        }
+                    ],                            
+                ],
+            ]
         ];
     }
 

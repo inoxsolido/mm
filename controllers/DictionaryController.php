@@ -8,6 +8,7 @@ use app\models\DictionarySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * DictionaryController implements the CRUD actions for Dictionary model.
@@ -26,6 +27,24 @@ class DictionaryController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'roles' => ['@']
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->identity->getIsAdmin();
+                        }
+                    ],                            
+                ],
+            ]
         ];
     }
 

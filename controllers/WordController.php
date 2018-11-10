@@ -26,7 +26,23 @@ class WordController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'rules' => [
+            [
+                'allow' => true,
+                'actions' => ['index'],
+                'roles' => ['@']
+            ],
+            [
+                'allow' => true,
+                'actions' => ['create', 'update', 'delete'],
+                'roles' => ['@'],
+                'matchCallback' => function($rule, $action){
+                    return Yii::$app->user->identity->getIsAdmin();
+                }
+            ],                            
+        ],
         ];
+
     }
 
     /**

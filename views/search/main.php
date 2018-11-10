@@ -10,7 +10,7 @@ app\assets\JqueryAutoCompleteAsset::register($this);
 <div class="search-main">
     <center>
     <div class="section-search-box" style="display:inline-block; min-width:500px; max-width:50%;">
-        <?=Yii::$app->controller->renderPartial('search_box',['selectionMediaType'=>$selectionMediaType])?>
+        <?=Yii::$app->controller->renderPartial('search_box')?>
     </div><!--include search option box-->
     </center>
     
@@ -182,6 +182,7 @@ $this->registerJsFile("@web/js/search.js",  ['depends' => [\yii\web\JqueryAsset:
             $(".player-right").show();
         }
         $("#player").find(".player-media-wrapper").html(mediaElement);
+        $(".player-download > a").eq(0).attr({href:full_link});
         $("#player-backdrop").show();
         $("#player").show();
         Plyr.setup("#media-player", controls);

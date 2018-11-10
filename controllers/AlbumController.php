@@ -10,6 +10,8 @@ use app\models\Media;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use app\components\AjaxFilter;
 
 /**
  * AlbumController implements the CRUD actions for Album model.
@@ -22,12 +24,29 @@ class AlbumController extends Controller
     public function behaviors()
     {
         return [
+            [
+                'class' => AjaxFilter::className(),
+                'only' => ['check-album-name', 'delete-selected-media']
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
+                    'check-album-name' => ['POST'],
                     'delete' => ['POST'],
+                    'delete-selected-media' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'except'=>['view'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['delete', 'deleted-selected-media', 'detail', 'index', 'update'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -44,25 +63,6 @@ class AlbumController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
-    }
-
-
-    /**
-     * Creates a new Album model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Album();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
     }
 
     /**
@@ -132,12 +132,7 @@ class AlbumController extends Controller
                             $media_set = $new_media_set;
 
                             unset($new_media_set);
-                            //-----
-//                            $media_id_set = array_keys($media_set);
-//                            // Remove x From $media_set because javascript need to add character in index of array to prevent auto index creation on javascript
-//                            $media_id_set = array_map(function($e){
-//                                return intval(str_replace('x','',$e));
-//                            },$media_id_set);
+   
                             $media = Media::find()->where(['id' => $media_id_set])->all();
                             $new_file_path = 'Image/'.$album->name;
                             foreach ($media as $m) {
@@ -205,6 +200,10 @@ class AlbumController extends Controller
                 ]);
             }
     }
+    /**
+     * Ajax function to validate name
+     * @return mixed
+     */
     public function actionCheckAlbumName(){
         if(Yii::$app->request->isPost){
             $album_id = Yii::$app->request->post("album_id");
@@ -222,7 +221,11 @@ class AlbumController extends Controller
             return Yii::$app->response->statusText;
         }
     }
-    
+    /**
+     * Ajax to delete Media by given media id
+     * 
+     * @return mixed
+     */
     public function actionDeleteSelectedMedia(){
         if(Yii::$app->request->isPost){
             if(Yii::$app->user->isGuest !== true){
@@ -233,21 +236,7 @@ class AlbumController extends Controller
                 }
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-//                    $setting = Settings::getSetting();
-//                    $ftp = new \app\components\FtpClient();
-//                    $ftp->connect($setting->ftp_host);
-//                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-//                    $ftp->pasv(true);
-
                     Media::deleteAll(['id' => $media_id_set]);
-//                    $media = Media::find()->where(['id'=>$media_id_set])->all();
-//                    foreach ($media as $m) {
-//                        /* @var $m Media */
-//                        $file_path = $m->getFtpPath($setting);
-//                        if($ftp->delete($file_path)){
-//                            $m->delete();
-//                        }
-//                    }
                     $transaction->commit();
                     Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
                 }catch(Exception $e){

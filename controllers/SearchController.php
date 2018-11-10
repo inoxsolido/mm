@@ -5,62 +5,58 @@ namespace app\controllers;
 use Yii;
 use yii\web\Controller;
 //models
-use app\models\Media;
 use app\models\MediaSearch;
-use app\models\MediaType;
 use app\models\Dictionary;
-use app\models\FrequencyRelation;
 use app\models\Settings;
-//components
-use app\components\Utility;
+
+use yii\filters\AccessControl;
+use app\components\AjaxFilter;
+
 
 class SearchController extends Controller {
 
+    public function behaviors() {
+        return [
+            [
+                'class' => AjaxFilter::className(),
+                'only' => [ 'search', 'suggest-word']
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                
+                'except'=> ['index', 'search', 'suggest-word', 'album'],
+                'rules' => [
+                    [
+                        'allow'=>false,
+                        'actions' => ['directory'],
+                        'roles' => ['?']
+                    ],                           
+                ],
+            ]
+        ];
+    }
+    
+    /**
+     * This is Default Route to display all medias.
+     * @return mixed List of media
+     */
     public function actionIndex() {
         $params = Yii::$app->request->queryParams;
-        $q = Yii::$app->request->get("q");
-        $type = [];
-        $type['v'] = Yii::$app->request->get("v");
-        $type['i'] = Yii::$app->request->get("i");
-        $type['a'] = Yii::$app->request->get("a");
-        $type['d'] = Yii::$app->request->get("d");
-        $type['e'] = Yii::$app->request->get("e");
-        $dr = Yii::$app->request->get("dr");
-        $oAlbum = Yii::$app->request->get("oAlbum");
         
-        /* @var $setting \app\models\Settings */
-        $setting = Settings::getSetting();
-
-        $mediaType = MediaType::find()->all();
-        $selectionMediaType = \yii\helpers\ArrayHelper::map($mediaType, 'name', 'id');
-
-        if ($q != "") {
-            
-
-            $freg_relation_rate = $setting->frequency_relation_rate;
-            $related_word = [];
-            $sql = "SELECT word1 as word,frequency FROM frequency_relation WHERE word2 LIKE '%$q%' AND frequency >= $freg_relation_rate \n"
-                    . "UNION \n"
-                    . "SELECT word2 as word,frequency FROM frequency_relation WHERE word1 LIKE '%$q%' AND frequency >= $freg_relation_rate \n"
-                    . "ORDER BY frequency DESC";
-            $related_word = Yii::$app->db->createCommand($sql)->queryColumn('word');
-            $params['related_word'] = $related_word;
-            //เพิ่ม frequency word
-        }
         $searchModel = new MediaSearch();
         $dataProvider = $searchModel->search($params);
-//        $models = $dataProvider->getModels();
-//        Yii::$app->utility->debug($models);
+
+        $setting = Settings::getSetting();
         return $this->render('/search/main', [
                     'dataProvider' => $dataProvider,
                     'setting' => $setting,
-                    'selectionMediaType' => $selectionMediaType,
         ]);
     }
-    /*ajax request
-     * return html content
-     */
     
+    /**
+     * Ajax query to search media
+     * @return string html content
+     */
     public function actionSearch() {
         /* Data from request:
          * 1. query (text)
@@ -91,7 +87,10 @@ class SearchController extends Controller {
                     'setting' => $setting,
         ]);
     }
-    
+    /**
+     * Display album element with search box
+     * @return mixed
+     */
     public function actionAlbum(){
         
         $q = Yii::$app->request->get('q');
@@ -105,7 +104,11 @@ class SearchController extends Controller {
             ]);
         }
     }
-    
+    /**
+     * Display file in ftp-server by fetching file list from ftp
+     * @return mixed
+     * @throws \yii\web\HttpException
+     */
     public function actionDirectory(){
         $path = Yii::$app->request->get('path');
         $path = str_replace("..","",$path);
