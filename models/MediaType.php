@@ -55,13 +55,13 @@ class MediaType extends \yii\db\ActiveRecord
         return $this->hasMany(Media::className(), ['media_type_id' => 'id']);
     }
     
-    public static function getExtensionAsString($typeName=['video'], $comma=true, $dot=true){
+    public static function getExtensionAsString($typeName=['video'], $comma=true, $dot=false){
         $extension_arr = self::find()->select("extension")->where(['in', 'name',$typeName])->asArray()->all();
         $result = "";
         foreach($extension_arr as $arr){
             $result .= ' '.$arr['extension'];
         }
-        if(!$comma) $result = str_replace(",", "", $result);
+        if(!$comma) $result = str_replace(",", " ", $result);
         if(!$dot) $result = str_replace(".", "", $result);
         return $result;
     }

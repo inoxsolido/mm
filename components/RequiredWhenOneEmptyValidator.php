@@ -13,7 +13,7 @@ class RequiredWhenOneEmptyValidator extends Validator
     public function init()
     {
         parent::init();
-        $this->message = 'cannot be blank.555';
+        $this->message = 'cannot be blank.';
     }
 
 //    public function validateAttribute($model, $attribute)
