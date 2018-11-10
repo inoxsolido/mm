@@ -125,6 +125,8 @@ $resultModel = $dataProvider->getModels();
                            href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
                     <?php if($model['album_id']):?>
                     <p>Album: <a href="<?=Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a></p>
+                    <?php else: ?>
+                    <p>&nbsp;</p>
                     <?php endif; ?>
                     <p>Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?></p>
                 </div>
