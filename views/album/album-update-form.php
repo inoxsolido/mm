@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
         <div style='float:left;'><?php if ($album): ?>
                 <button id="btnapplytag" class="btn btn-success">Use Album's tag</button><?php endif; ?></div>
         <div style='float:right'>
-            <button id="media-delete" class="btn btn-warning" data-confirm="Are you sure you want to delete these item?">Delete Selected Media</button>
+            <button id="media-delete" class="btn btn-warning">Delete Selected Media</button>
             <a href='<?= Url::to(['album/delete', 'id'=>@$album->id])?>' id="album-delete" class="btn btn-danger" data-method='post' data-confirm="Are you sure you want to delete this item?"> Delete Album</a>
             <button id="album-save" class="btn btn-primary">Save</button>
         </div>

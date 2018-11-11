@@ -42,7 +42,7 @@ class AlbumController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['delete', 'deleted-selected-media', 'detail', 'index', 'update'],
+                        'actions' => ['delete', 'delete-selected-media', 'detail', 'index', 'update'],
                         'roles' => ['@'],
                     ],
                 ],
