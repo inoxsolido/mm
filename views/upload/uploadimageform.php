@@ -120,9 +120,9 @@ $(function(){
         let $files = $("#album-files");
         let files = $files[0].files;
         var i=0;
-        if($files[0].files.length){
-            
-            $.each(files, function(key, value){
+        
+        function readFile(file){
+            return new Promise (function (resolved, rejected) {
                 let reader = new FileReader();
                 reader.onload = function(readerEvent){
                     let image = new Image();
@@ -154,25 +154,32 @@ $(function(){
                         context.drawImage(image, 0, -(y/2), width, height);
                         
                         var dataUrl = canvas.toDataURL('image/jpeg', 1);
-                        thumbnail_data.push(dataUrl);
-                        $('<input />').attr('type', 'hidden')
-                            .attr('name', "thumbnails[]")
-                            .attr('value', dataUrl).appendTo('form');
-                        
+                        resolved(dataUrl);
                     };
                     image.src = readerEvent.target.result;
                     
                 };
                 reader.onloadend = function(readerEvent){
-                    console.log(i);
-                    if(i===files.length){
+                    if(i===files.length-1){
                         $("#btnsubmit").prop({disabled:false});
                     }else{
                         $("#btnsubmit").prop({disabled:true});
                     }
                     
                 };
-                reader.readAsDataURL(value);
+                reader.readAsDataURL(file);
+                
+            });
+        }
+        
+        if($files[0].files.length){
+                       
+            $.each(files, async function(key, value){
+                let dataurl = await readFile(value);
+                thumbnail_data.push(dataurl);
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', "thumbnails["+i+"]")
+                            .attr('value', dataurl).appendTo('form');
                 i++;
             });
         }
