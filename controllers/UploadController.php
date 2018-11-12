@@ -58,6 +58,10 @@ class UploadController extends Controller{
             $m_album->load(Yii::$app->request->post());
             $m_album->files = UploadedFile::getInstances($m_album, 'files');
             $thumbnails = Yii::$app->request->post('thumbnails');
+//                Yii::$app->response->statusCode=500;
+//                Yii::$app->utility->debug($m_album->files,false,false);
+//                echo '<hr/>';
+//                Yii::$app->utility->debug($thumbnails,false,true);
             $i=0;$thumb_len=count($thumbnails);
             if($thumb_len !== count($m_album->files)){
                 Yii::$app->response->statusCode=405;
@@ -84,7 +88,8 @@ class UploadController extends Controller{
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
                 $ftp->pasv(true);
                 \yii\helpers\FileHelper::createDirectory("uploads/temp/");
-                foreach ($m_album->files as $file) {
+
+                foreach ($m_album->files as $key => $file) {
                     $media = new Media;
                     $media->updateFileDate();
                     $media->album_id = $m_album_id;
@@ -97,7 +102,7 @@ class UploadController extends Controller{
                     $media->file_name = $media->getNewFileName();
                     $media->file_extension = '.' . $file->getExtension();
                     
-                    $media->thumbnail_from_video = $thumbnails[$i];
+                    $media->thumbnail_from_video = $thumbnails[$key];
                     $temp_path = "uploads/temp/" . Yii::$app->getSecurity()->generateRandomString(4);
                     $real_temp_path = Yii::getAlias("@realwebroot/$temp_path");
                     $real_temp_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $real_temp_path);
@@ -110,7 +115,6 @@ class UploadController extends Controller{
                     \file_put_contents($real_temp_path, $media->getThumbnailDecoded());
                     $media->file_thumbnail_path = 'thumbnails/thumbnail_'. $media->file_name.'.jpeg';
 //                    $media->file_thumbnail_path = $media->file_path;
-                    $i++;
                     $media->is_public = 0;
                     if(!$media->save()){
                         throw new \Exception("An error was found while saving {$media->name}.". print_r($media->errors));

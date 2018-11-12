@@ -113,7 +113,7 @@ $(function(){
         //clear old thumbnail data
         $("input[name=thumbnails\\[\\]]").remove();
         //add new data;
-        addThumbnailToForm();
+        console.log(addThumbnailToForm());
     });
     function addThumbnailToForm(){
         var thumbnail_data = [];
@@ -173,17 +173,19 @@ $(function(){
         }
         
         if($files[0].files.length){
-                       
-            $.each(files, async function(key, value){
-                let dataurl = await readFile(value);
-                thumbnail_data.push(dataurl);
-                        $('<input />').attr('type', 'hidden')
-                            .attr('name', "thumbnails["+i+"]")
-                            .attr('value', dataurl).appendTo('form');
-                i++;
-            });
+            let result = async function(files){
+                for (i=0; i < files.length; i++){
+                    let dataurl = await readFile(files[i]);
+                    await thumbnail_data.push(dataurl);
+                    let $new_input = await $('<input />').attr({type:'hidden', name: 'thumbnails['+i+']', value: dataurl});
+                    await $new_input.appendTo('form');
+                    await console.log(i+':::'+files[i].name);
+                    await console.log(dataurl);
+                }
+            }
+            result(files);
+            
         }
-        console.log(i);
         return thumbnail_data;
            
     }
