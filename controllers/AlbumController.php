@@ -75,139 +75,129 @@ class AlbumController extends Controller
     {
         if(Yii::$app->request->isPost){
             
-                $media_set = Yii::$app->request->post("media_set");
-                $album_data = Yii::$app->request->post("album_data");
-                /* @var $setting \app\models\Settings */
-                $setting = \app\models\Settings::getSetting();
-                $ftp = new \app\components\FtpClient();
-                
-                $new_file_path = '';
-                $oldFolderName='';$newFolderName='';//declare for exception catching
-                if($album_data){//update Album Data
-                    $album = Album::findOne($album_data['id']);
-                    if(!$album){//Incorrect Album Id
-                        Yii::$app->response->statusCode = 400;
-                        return "Incorrect Album Id";
+            $media_set = Yii::$app->request->post("media_set");
+            $album_data = Yii::$app->request->post("album_data");
+            /* @var $setting \app\models\Settings */
+            $setting = \app\models\Settings::getSetting();
+            $ftp = new \app\components\FtpClient();
+
+            $new_file_path = '';
+            $oldFolderName='';$newFolderName='';//declare for exception catching
+            if($album_data == null){
+                Yii::$app->response->statusCode = 400;
+                return "Album data is missing";
+            }
+            //update Album Data
+            $album = Album::findOne($album_data['id']);
+            if(!$album){//Incorrect Album Id
+                Yii::$app->response->statusCode = 400;
+                return "Incorrect Album Id";
+            }
+            $ftp->connect($setting->ftp_host);
+            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+            $ftp->pasv(true);
+            //Change Album Name
+            if($album->name != $album_data['name']){ //Changing
+                //Check duplicate new name with old albums
+                $album->name = $album_data['name'];
+                if(!$album->validate(['name'])){ // new name is duplicated
+                    Yii::$app->reponse->statusCode = 400;
+                    return "Album name is exist";
+                }else{//Rename folder on FTP Server
+                    $oldFolderName = $setting->ftp_part.'/Image/'.$album->getOldAttribute('name');
+                    $newFolderName = $setting->ftp_part.'/Image/'.$album->name;
+
+                    if($ftp->isDir($oldFolderName) && !$ftp->rename($oldFolderName,$newFolderName)){//return if cant rename
+                        Yii::$app->response->statusCode = 500;
+                        return "ไม่สามารถเปลี่ยนชื่ออัลบั้มภายใน FTP Server ได้";
                     }
-                    $ftp->connect($setting->ftp_host);
-                    $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-                    $ftp->pasv(true);
-                    //Change Album Name
-                    if($album->name != $album_data['name']){ //Changing
-                        //Check duplicate new name with old albums
-                        $album->name = $album_data['name'];
-                        if(!$album->validate(['name'])){ // new name is duplicated
-                            Yii::$app->reponse->statusCode = 400;
-                            return "Album name is exist";
-                        }else{//Rename folder on FTP Server
-                            $oldFolderName = $setting->ftp_part.'/Image/'.$album->getOldAttribute('name');
-                            $newFolderName = $setting->ftp_part.'/Image/'.$album->name;
+                }
+            }
+            $album->tags = $album_data['tags'];
+            $transaction = Yii::$app->db->beginTransaction();
+            try{
+                if(!$album->save()){
+                    throw new \Exception("บันทึกข้อมูลอัลบั้มไม่สำเร็จ");
+                }
+                //update all media file_path when album name was changed 
+                if($album->name != $album_data['name'] && !Media::updateAll(['file_path'=>"Image/{$album->name}"], ['album_id'=>$album->id])){
+                    throw new \Exception("Error while updating Media that related with this album.");
+                }
+                $transaction->commit();
 
+            } catch (\Exception $ex) {
+                $transaction->rollback();
+                //rename folder back
+                if($newFolderName != ''){
+                    if($ftp->isDir($newFolderName)){
+                        $ftp->rename($newFolderName, $oldFolderName);
+                    }
+                }
+                Yii::$app->response->statusCode = 500;
+                return $ex->getMessage();
+            }
+            if($media_set) {
+                //re struct to media_set['id']['attribute']
+                $media_id_set = [];
+                $new_media_set = [];
+                foreach($media_set as $ms){
+                    $media_id_set[] = $ms[0];
+                    $new_media_set[$ms[0]] = [];
+                    $new_media_set[$ms[0]]['name'] = $ms[1];
+                    $new_media_set[$ms[0]]['tags'] = $ms[2];
+                    $new_media_set[$ms[0]]['is_public'] = $ms[3];
+                }
+                $media_set = $new_media_set;
 
-                            if($ftp->isDir($oldFolderName) && !$ftp->rename($oldFolderName,$newFolderName)){//return if cant rename
+                unset($new_media_set);
+
+                $media = Media::find()->where(['id' => $media_id_set])->all();
+                $new_file_path = 'Image/'.$album->name;
+                foreach ($media as $m) {
+                    /* @var $m Media */
+                    //assign
+                    $m->tags = $media_set[$m->id]['tags'];
+                    $m->is_public = $media_set[$m->id]['is_public'];
+                    $m->file_path = $new_file_path;
+                    //backup 
+                    $old_name = $m->name;
+                    $oldFtpPath = $m->getFtpPath($setting);
+                    $oldThumbnail = $m->getThumbnailFtpPath($setting);
+
+                    $m->name = $media_set[$m->id]['name'];
+                    if($m->name != $old_name){
+
+                        $m->file_name = $m->getNewFileName();
+                        $newFtpPath = $m->getFtpPath($setting);
+                        $newThumbnail = $m->getThumbnailFtpPath($setting);
+                        if($m->validate() && $ftp->rename($oldFtpPath,$newFtpPath)){
+
+                            if(!$m->save(false)){
                                 Yii::$app->response->statusCode = 500;
-                                return "ไม่สามารถเปลี่ยนชื่ออัลบั้มภายใน FTP Server ได้";
+                                return "ไม่สามารถบันทึกไฟล์ $old_name ได้";
                             }
-                        }
-                    }
-                    $album->tags = $album_data['tags'];
-                    $transaction = Yii::$app->db->beginTransaction();
-                    try{
-                        if(!$album->save()){
-                            throw new \Exception("บันทึกข้อมูลอัลบั้มไม่สำเร็จ");
-                        }
-                        //update all medias file_path 
-                        if(!Media::updateAll(['file_path'=>"Image/{$album->name}"], ['album_id'=>$album->id])){
-                            throw new \Exception("Error while updating Medias that related with this album.");
-                        }
-                        $transaction->commit();
-                        
-                    } catch (\Exception $ex) {
-                        $transaction->rollback();
-                        //rename folder back
-                        if($newFolderName != ''){
-                            if($ftp->isDir($newFolderName)){
-                                $ftp->rename($newFolderName, $oldFolderName);
-                            }
-                        }
-                        Yii::$app->response->statusCode = 500;
-                        return $ex->getMessage();
-                    }
-                    if(!$album->save()){
-                        Yii::$app->response->statusCode = 500;
-                        return "บันทึกข้อมูลอัลบั้มไม่สำเร็จ";
-                    }else{
-                        if($media_set) {
-//                            $ftp->connect($setting->ftp_host);
-//                            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
-//                            $ftp->pasv(true);
-                            
-                            //re struct to media_set['id']['attribute']
-                            $media_id_set = [];
-                            $new_media_set = [];
-                            foreach($media_set as $ms){
-                                $media_id_set[] = $ms[0];
-                                $new_media_set[$ms[0]] = [];
-                                $new_media_set[$ms[0]]['name'] = $ms[1];
-                                $new_media_set[$ms[0]]['tags'] = $ms[2];
-                                $new_media_set[$ms[0]]['is_public'] = $ms[3];
-                            }
-                            $media_set = $new_media_set;
-
-                            unset($new_media_set);
-   
-                            $media = Media::find()->where(['id' => $media_id_set])->all();
-                            $new_file_path = 'Image/'.$album->name;
-                            foreach ($media as $m) {
-                                /* @var $m Media */
-                                //assign
-                                $m->tags = $media_set[$m->id]['tags'];
-                                $m->is_public = $media_set[$m->id]['is_public'];
-                                $m->file_path = $new_file_path;
-                                //backup 
-                                $old_name = $m->name;
-                                $oldFtpPath = $m->getFtpPath($setting);
-                                $oldThumbnail = $m->getThumbnailFtpPath($setting);
-                                
-                                $m->name = $media_set[$m->id]['name'];
-                                if($m->name != $old_name){
-                                    
-                                    $m->file_name = $m->getNewFileName();
-                                    $newFtpPath = $m->getFtpPath($setting);
-                                    $newThumbnail = $m->getThumbnailFtpPath($setting);
-                                    if($m->validate() && $ftp->rename($oldFtpPath,$newFtpPath)){
-                                        
-                                        if(!$m->save(false)){
-                                            Yii::$app->response->statusCode = 500;
-                                            return "ไม่สามารถบันทึกไฟล์ $old_name ได้";
-                                        }
-                                    }else{
-                                        //try to rename back
-                                        $ftp->rename($newFtpPath, $oldFtpPath);
-                                        Yii::$app->response->statusCode = 500;
-                                        return "ไม่สามารถเปลี่ยนชื่อไฟล์ $old_name ได้";
-                                    }
-
-                                }else{
-                                    if(!$m->save()){
-                                        Yii::$app->response->statusCode = 500;
-                                        return "ไม่สามารถบันทึกไฟล์ $old_name ได้";
-                                    }
-                                }
-                            }
-                            return "บันทึกข้อมูลสำเร็จ";
                         }else{
-                            if($album->getMedia()->count()){
-                                Yii::$app->response->statusCode = 400;
-                                return "Media Data is missing";
-                            }else{
-                                return "บันทึกข้อมูลสำเร็จ";
-                            }
+                            //try to rename back
+                            $ftp->rename($newFtpPath, $oldFtpPath);
+                            Yii::$app->response->statusCode = 500;
+                            return "ไม่สามารถเปลี่ยนชื่อไฟล์ $old_name ได้";
+                        }
+
+                    }else{
+                        if(!$m->save()){
+                            Yii::$app->response->statusCode = 500;
+                            return "ไม่สามารถบันทึกไฟล์ $old_name ได้";
                         }
                     }
+                }
+                return "บันทึกข้อมูลสำเร็จ";
                 }else{
-                    Yii::$app->response->statusCode = 400;
-                    return "Album Data is missing";
+                    if($album->getMedia()->count()){
+                        Yii::$app->response->statusCode = 400;
+                        return "Media Data is missing";
+                    }else{
+                        return "บันทึกข้อมูลสำเร็จ";
+                    }
                 }
             }else{//Request type: GET
                 $m_album = $this->findModel($id);

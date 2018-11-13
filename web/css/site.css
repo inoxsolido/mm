@@ -394,7 +394,7 @@ html, body{
  /*loader 3  */
 .loader3, .loader3 div {
   border-radius: 50%;
-  padding: 8px;
+  padding: 2px;
   border: 2px solid transparent;
   -webkit-animation: rotate linear 3.5s infinite;
           animation: rotate linear 3.5s infinite;
@@ -408,9 +408,9 @@ html, body{
 
 .loader {
   position: relative;
-  margin: 75px auto;
-  width: 50px;
-  height: 50px;
+  margin: 0 auto;
+  width: 75px;
+  height: 75px;
   display: block;
   overflow: hidden;
 }
@@ -505,4 +505,9 @@ html, body{
 /* Show the tooltip text when you mouse over the tooltip container */
 .customtooltip:hover .tooltiptext {
     visibility: visible;
+}
+
+.percent{
+    color:black !important;
+    font-weight:bold !important;
 }

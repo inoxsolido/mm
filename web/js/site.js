@@ -1,14 +1,13 @@
-document.onreadystatechange = function () {
-  var state = document.readyState
-  if (state == 'interactive') {
-       document.getElementById('loading').style.visibility="visible";
-  } else if (state == 'complete') {
-      setTimeout(function(){
-         document.getElementById('loading').style.visibility="hidden";
-      },1000);
-  }
-};
 $(function () {
+    $(document).bind("readystatechange", function(e){
+        var state = document.readyState;
+        if (state == 'interactive') {
+            $("#loading").show();
+        } else if (state == 'complete') {
+            $("#loading").hide();
+        }
+        
+    });
     $(document).on("click", "#upload-image", function (e) {
         e.preventDefault();
         
