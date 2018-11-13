@@ -36,7 +36,21 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <?php $this->beginBody()?>
         <div id="error-messages" class="alert alert-danger alert-popup" style="opacity: 1; display: none"></div>
         <div id="success-messages" class="alert alert-success alert-popup" style="opacity: 1; display: none"></div>
-        <div id='loading' style=''>loading</div>
+        <div id="loading">
+        <div class='loader loader3'>
+            <div>
+              <div>
+                <div>
+                  <div>
+                    <div>
+                      <div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        </div>
         <div class="wrapper">
 
             <?=$this->render('header.php', ['directoryAsset' => $directoryAsset])?>
