@@ -313,7 +313,7 @@ class UploadController extends Controller{
                     Yii::$app->response->statusCode = 500;
                     return 'Upload fail';
                 }else{
-                    return $this->redirect(Url::to(['media/media-edit', 'id' => $model->id]));
+                    return Url::to(['media/media-edit', 'id' => $model->id]);
                 }
 
                 
