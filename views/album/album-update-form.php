@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
 <script>
     var url={
         album_save: "<?= Url::to(['album/update']) ?>",
-        media_delete: "<?= Url::to(['album/delete-selected-media']) ?>",
+        media_delete: "<?= Url::to(['media/delete-selected-media']) ?>",
         check_album_name: "<?=Url::to(['album/check-album-name']) ?>"
     }
 </script>

@@ -26,14 +26,14 @@ class AlbumController extends Controller
         return [
             [
                 'class' => AjaxFilter::className(),
-                'only' => ['check-album-name', 'delete-selected-media']
+                'only' => ['check-album-name']
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'check-album-name' => ['POST'],
                     'delete' => ['POST'],
-                    'delete-selected-media' => ['POST'],
+                    
                 ],
             ],
             'access' => [
@@ -42,9 +42,17 @@ class AlbumController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['delete', 'delete-selected-media', 'detail', 'index', 'update'],
+                        'actions' => ['detail', 'index', 'update'],
                         'roles' => ['@'],
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete'],
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->identity->getIsAdmin();
+                        }
+                    ], 
                 ],
             ]
         ];
@@ -232,31 +240,7 @@ class AlbumController extends Controller
             return Yii::$app->response->statusText;
         }
     }
-    /**
-     * Ajax to delete Media by given media id
-     * 
-     * @return mixed
-     */
-    public function actionDeleteSelectedMedia(){
- 
-        $media_id_set = Yii::$app->request->post("media_id_set");
-        if(Empty($media_id_set)){
-            Yii::$app->response->statusCode = 400;
-            return 'Media set is missing!.';
-        }
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            Media::deleteAll(['id' => $media_id_set]);
-            $transaction->commit();
-            Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
-        }catch(Exception $e){
-            $transaction->rollBack();
-            Yii::$app->response->statusCode = 500;
-            Yii::$app->response->statusText = $e->getMessage();
-            return Yii::$app->response->statusText;
-        }
-            
-    }
+    
     /**
      * Deletes an existing Album model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

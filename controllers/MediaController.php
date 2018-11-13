@@ -13,6 +13,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
+use app\components\AjaxFilter;
 
 /**
  * MediaController implements the CRUD actions for Media model.
@@ -28,10 +29,15 @@ class MediaController extends Controller
     public function behaviors()
     {
         return [
+            [
+                'class' => AjaxFilter::className(),
+                'only' => ['delete-selected-media']
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete'=>['POST']
+                    'delete'=>['POST'],
+                    'delete-selected-media' => ['POST'],
                 ],
             ],
             'access' => [
@@ -40,7 +46,12 @@ class MediaController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'media-edit', 'delete'],
+                        'action' => ['index', 'media-edit', ],
+                        'roles' => ['@']
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete', 'delete-selected-media'],
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->identity->getIsAdmin();
@@ -158,6 +169,31 @@ class MediaController extends Controller
             );
         }
         return $this->goBack();
+    }
+    
+    /**
+     * Ajax to delete Media by given media id
+     * 
+     * @return mixed
+     */
+    public function actionDeleteSelectedMedia(){
+ 
+        $media_id_set = Yii::$app->request->post("media_id_set");
+        if(Empty($media_id_set)){
+            Yii::$app->response->statusCode = 400;
+            return 'Media set is missing!.';
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Media::deleteAll(['id' => $media_id_set]);
+            $transaction->commit();
+            Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
+        }catch(Exception $e){
+            $transaction->rollBack();
+            Yii::$app->response->statusCode = 500;
+            Yii::$app->response->statusText = $e->getMessage();
+            return Yii::$app->response->statusText;
+        }      
     }
     
     /**
