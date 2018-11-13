@@ -65,7 +65,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            
             [
                 'label' => 'ภาพตัวอย่าง',
                 'headerOptions' => ['style' => 'min-width:200px'],
@@ -85,11 +84,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             [
                 'attribute' => 'album_id',
-                'value' => 'album.name'
+                'value' => function($model){
+                    if(@$model['album']['name'] != null)
+                        return Html::a($model['album']['name'], Url::to(['album/index','AlbumSearch[name]'=>$model['album']['name']]));
+                    return null;
+                },
+                'format'=>'html',
             ],
             [
                 'attribute' => 'tags',
-                'format' => 'ntext',
+                'value'=>function($model){
+                    if(@$model->tags == null)return null;
+                    $tags = explode(',', $model->tags);
+                    $html = '';
+                    foreach($tags as $tag){
+                        $html .= Html::a($tag, Url::current(['MediaSearch[tags]'=>$tag])).'&nbsp;&nbsp;';
+                    }
+                    return $html;
+                },
+                'format' => 'html',
                 'enableSorting' => false,
             ],
             [
@@ -137,10 +150,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class'=>'previewable view'
                         ]);
                     },
-                    'update' => function ($model, $key, $index) {
+                    'update' => function ($url, $model, $index) {
                         $url = Url::to(["media/media-edit",'id'=>$index]);
-                        return Html::a('<span class="glyphicon glyphicon-pencill"></span>', $url, [
-                            'title' => Yii::t('yii', 'View'),
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                            'title' => Yii::t('yii', 'Update'),
                         ]);
                     },
 

@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
@@ -20,10 +21,28 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
 
-            'name',
+            [
+                'attribute' => 'name',
+                'attribute' => 'album_id',
+                'value' => function($model){
+                    if(@$model->name != null)
+                        return Html::a($model->name, Url::to(['media/index','MediaSearch[album_id'=>$model->name]));
+                    return null;
+                },
+                'format'=>'html',
+            ],
             [
                 'attribute' => 'tags',
-                'format' => 'ntext',
+                'value'=>function($model){
+                    if(@$model->tags == null)return null;
+                    $tags = explode(',', $model->tags);
+                    $html = '';
+                    foreach($tags as $tag){
+                        $html .= Html::a($tag, Url::current(['AlbumSearch[tags]'=>$tag])).'&nbsp;&nbsp;';
+                    }
+                    return $html;
+                },
+                'format' => 'html',
                 'enableSorting' => false,
             ],
 
