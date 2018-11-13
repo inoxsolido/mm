@@ -66,6 +66,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             [
+                'header'=>'<input id="check-main-all" type="checkbox" class="check-main-all"/>',
+                'headerOptions' => ['style'=>['text-align'=>'center']],
+                'value' => function(){return '<input type="checkbox" class="check-main"/>';},
+                'format' => 'raw'
+            ],
+            [
                 'label' => 'ภาพตัวอย่าง',
                 'headerOptions' => ['style' => 'min-width:200px'],
                 'value' => function($model){
@@ -139,6 +145,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
+                'header' => '<button id="media-delete" class="btn btn-danger">Delete Selected Media</button>',
                 'template' => "{view} {update} {delete}",
                 'buttons' => [
                     'view' => function ($url, $model, $index) {
@@ -166,7 +173,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php Pjax::end(); ?></div>
 <?php JSRegister::begin(['position'=> \yii\web\View::POS_READY]); ?>
 <script>
-    window.url_suggest_word = "<?=Url::to(['search/suggest-word'])?>";
     //lib
     var controls = {controls: [
         'play-large', // The large play button in the center
@@ -314,6 +320,61 @@ $this->params['breadcrumbs'][] = $this->title;
         let $target = $(".previewable[data-id="+id+"]:first");
         if($target.length) $target.click();
     }
+    
+    $("#media-delete").click(function(){
+        var media_id_set,
+        media_checked = $(".check-main:checked");
+        if(!media_checked.length){
+            errorPopUp("กรุณาเลือกไฟล์ก่อน");
+            return false;
+        }else{
+            if(!confirm('Are you sure you want to delete these item?')) return false;
+            media_id_set = $.map(media_checked, function(media){
+                return $(media).val();
+            });
+            $.ajax({
+                url: "<?= Url::to(['media/delete-selected-media'])?>",
+                type: "POST",
+                async: false,
+                data:{
+                    _csrf: csrfToken,
+                    media_id_set: media_id_set
+                }
+            }).done(function(data, textStatus, jqXHR){
+//                successPopUp("ลบข้อมูลสำเร็จ");
+                $(".check-main:checked").parents('tr').remove();
+                window.location.reload();
+            }).fail(function(jqXHR,textStatus,errorThrown){
+                if(jqXHR.status === 500){
+                    errorPopUp(jqXHR.responseText);
+                }else{
+                    errorPopUp(textStatus);
+                }
+            });
+        }
+        
+    });
+    $("#p0").on("change",".check-main", function(){
+        var checked = $(".check-main:checked").length;
+        var checkbox_all = $(".check-main").length;
+        if(checked === checkbox_all){
+            $(".check-main-all").prop({checked: true});
+            $(".check-main-all").prop({indeterminate: false});
+        }else if(checked === 0){
+            $(".check-main-all").prop({checked: false});
+            $(".check-main-all").prop({indeterminate: false});
+        }else{
+            $(".check-main-all").prop({indeterminate: true});
+            $(".check-main-all").prop({checked: false});
+        }
+        
+    });
+    
+    $("#p0").on("change", ".check-main-all", function(){
+        var state = $(".check-main-all").is(":checked");
+        $(".check-main").prop({checked: state});
+    });
+    
     captureUrl();
 </script>
 <?php JSRegister::end(); ?>
