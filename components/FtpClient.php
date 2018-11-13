@@ -89,6 +89,11 @@ class FtpClient extends \yii2mod\ftp\FtpClient
         return false;
     }
     
+    public function isEmpty($directory){
+        $items = $this->nlist($directory);
+        return count($items)?false:true;
+    }
+    
     /**
      * Returns a list of files in the given directory
      *
@@ -105,11 +110,11 @@ class FtpClient extends \yii2mod\ftp\FtpClient
     public function nlist($directory = '.', $recursive = false, $filter = 'sort')
     {
         if (!$this->isDir($directory)) {
-            throw new FtpException('"' . $directory . '" is not a directory');
+            return false;
         }
         $files = $this->getWrapper()->nlist($directory);
         if ($files === false) {
-            throw new FtpException('Unable to list directory');
+            return false;
         }
         $result = [];
         $dir_len = strlen($directory);
