@@ -113,8 +113,7 @@ class UploadController extends Controller{
                     }
                     // store base64 to jpeg file
                     \file_put_contents($real_temp_path, $media->getThumbnailDecoded());
-                    $media->file_thumbnail_path = 'thumbnails/thumbnail_'. $media->file_name.'.jpeg';
-//                    $media->file_thumbnail_path = $media->file_path;
+                    $media->generateUniqueThumbnailPath('.jpeg', $setting, $ftp);
                     $media->is_public = 0;
                     if(!$media->save()){
                         throw new \Exception("An error was found while saving {$media->name}.". print_r($media->errors));
@@ -181,7 +180,7 @@ class UploadController extends Controller{
             //get files to model
             $model->media_file = UploadedFile::getInstance($model, 'media_file');
             $fileType = \app\models\MediaType::findOne(Yii::$app->request->post('type'));
-            if (!$fileType){ Yii::$app->response->statusCode = 500; return "Parameter is missing."; }
+            if (!$fileType){ Yii::$app->response->statusCode = 400; return "Parameter is missing."; }
             $real_temp_path='';
             try{
                 $setting = \app\models\Settings::getSetting();
@@ -211,14 +210,14 @@ class UploadController extends Controller{
                 if($model->getThumbnailDecoded()==null){
 
                     $model->thumbnail_file = UploadedFile::getInstance($model, 'thumbnail_file');
-                    $model->file_thumbnail_path = 'thumbnails/thumbnail_'. $model->file_name.'.'. $model->thumbnail_file->getExtension();
+                    $model->generateUniqueThumbnailPath('.'.$model->thumbnail_file->getExtension(), $setting, $ftp);
                     $real_temp_path = $model->thumbnail_file->tempName;
                     $ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY);
                    
                     
                 }else{
 
-                    $model->file_thumbnail_path = 'thumbnails/thumbnail_'. $model->file_name.'.jpeg';
+                    $model->generateUniqueThumbnailPath('.jpeg', $setting, $ftp);
                     $temp_path = "uploads/temp/" . Yii::$app->getSecurity()->generateRandomString(16);
                     $real_temp_path = Yii::getAlias("@realwebroot/$temp_path");
                     $real_temp_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $real_temp_path);
@@ -303,9 +302,8 @@ class UploadController extends Controller{
                 $ftp->put($model->getFtpPath($setting), $model->media_file->tempName, FTP_BINARY);
                 
                 //thumbnail
-
                 $model->thumbnail_file = UploadedFile::getInstance($model, 'thumbnail_file');
-                $model->file_thumbnail_path = 'thumbnails/thumbnail_'. $model->file_name.'.'. $model->thumbnail_file->getExtension();
+                $model->generateUniqueThumbnailPath('.'. $model->thumbnail_file->getExtension(), $setting, $ftp);
                 $real_temp_path = $model->thumbnail_file->tempName;
                 $ftp->put($model->getThumbnailFtpPath($setting), $real_temp_path, FTP_BINARY);
                     
