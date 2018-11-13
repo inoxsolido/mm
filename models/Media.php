@@ -141,24 +141,28 @@ class Media extends \yii\db\ActiveRecord
         if(!$setting) $setting = Settings::getSetting();
         return $setting->ftp_part.$this->file_path.'/'.$this->file_name.$this->file_extension;
     }
-
-
+    
+    /**
+     * Get new file name with no exist
+     * @param type $is_new_record
+     * @param type $file_path
+     * @return string
+     */
     public function getNewFileName($is_new_record = true, $file_path=""){
         if($file_path) $this->file_path = $file_path;
-//        $new_file_name = $this->name;
         $new_file_name = str_replace("#","",$this->name);
         $last_record = $is_new_record?
             Media::find()
                 ->select(["file_path", "file_upload_date", "file_name","name", "id"])
                 ->where(["file_path" => $this->file_path])
-                ->andWhere(['name'=>$new_file_name])
+                ->andWhere(['file_name'=>$new_file_name])
                 ->orderBy(["file_upload_date"=>SORT_DESC])
                 ->one()
             :Media::find()
                 ->select(["file_path", "file_upload_date", "file_name","name", "id"])
                 ->where(['!=', 'id' ,$this->id])
                 ->andwhere(["file_path" => $this->file_path])
-                ->andWhere(['name'=>$new_file_name])
+                ->andWhere(['file_name'=>$new_file_name])
                 ->orderBy(["file_upload_date"=>SORT_DESC])
                 ->one();
         $last_number = 0;
@@ -181,6 +185,33 @@ class Media extends \yii\db\ActiveRecord
         return $new_file_name;
 
     }
+    /**
+     * Generate unique thumbnail path
+     * @param string $extension
+     * @param \app\models\Settings $setting
+     * @param \app\components\FtpClient $ftp
+     */
+    public function generateUniqueThumbnailPath($extension, $setting='', $ftp=''){
+        if($setting == '') $setting = Settings::getSetting();
+        if($ftp == ''){
+            $ftp = new \app\components\FtpClient();
+            $ftp->connect($setting->ftp_host);
+            $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
+            $ftp->pasv(true);
+        }
+        $thumbnail_path = $setting->ftp_part.'/thumbnails/';
+        $new_thumbnail_name = Yii::$app->getSecurity()->generateRandomString();
+        $path_name = $thumbnail_path.$new_thumbnail_name;
+        
+        $file_list = $ftp->nlist($thumbnail_path);
+        while(in_array($path_name, $file_list)){
+            $new_thumbnail_name = Yii::$app->getSecurity()->generateRandomString();
+            $path_name = $thumbnail_path.$new_thumbnail_name;
+            $file_list = $ftp->nlist($thumbnail_path);
+        }
+        $this->file_thumbnail_path = '/thumbnails/'.$new_thumbnail_name.$extension;
+    }
+    
     public function getThumbnailDecoded(){
         if($this->thumbnail_from_video){
             $data = $this->thumbnail_from_video;
