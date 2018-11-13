@@ -46,7 +46,7 @@ class MediaController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'action' => ['index', 'media-edit', ],
+                        'actions' => ['index', 'media-edit', ],
                         'roles' => ['@']
                     ],
                     [
