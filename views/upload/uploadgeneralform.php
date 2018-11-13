@@ -159,6 +159,7 @@ $(function(){
             bar.width(0);
             percent.html(xhr.responseText);
             errorPopUp(xhr.responseText);
+            $("#loading").hide();
         },
         complete: function (xhr) {
             // status.html(xhr.responseText);
@@ -169,7 +170,7 @@ $(function(){
                 $(this).tagvalue($(this).val());
                 $(this).prop({disabled:false});
             });
-            $("#loading").hide();
+            
         }
     });
     

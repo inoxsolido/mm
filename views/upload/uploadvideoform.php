@@ -278,7 +278,7 @@ use yii\helpers\Url;
                 $(this).tagvalue($(this).val());
                 $(this).prop({disabled:false});
             });
-            $("#loading").hide();
+
         }
     });
     //--end form

@@ -264,7 +264,6 @@ $(function(){
                 $(this).tagvalue($(this).val());
                 $(this).prop({disabled: false});
             });
-            $("#loading").hide();
         }
     });
     
