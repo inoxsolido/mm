@@ -221,9 +221,9 @@ class MediaSearch extends Media {
         }
         $splited_tag = explode(',', $this->tags);
         foreach($splited_tag as $tag){
-            $query->andFilterWhere(['like', 'tags', $tag]);
+            $query->andFilterWhere(['like', 'media.tags', $tag]);
         }
-        $query->andFilterWhere(['like', 'name', $this->name])
+        $query->andFilterWhere(['like', 'media.name', $this->name])
                 ->andFilterWhere(['like', 'album.name', $this->album_id]);
 
         return $dataProvider;
