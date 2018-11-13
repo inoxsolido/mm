@@ -327,25 +327,42 @@ class Media extends \yii\db\ActiveRecord
         
         //get all media same condition to delete
         $models = static::find()->where($condition, $params)->all();
+        if(!$models)return 0;
         $file_paths = [];
         $thumbnail_paths = [];
+        $directories = [];
+        $album_id_list = [];
         foreach($models as $model){
-                $file_paths[] = $model->getFtpPath($setting);
+                $f = $model->getFtpPath($setting);
+                $file_paths[] = $f;
                 $thumbnail_paths[] = $model->getThumbnailFtpPath($setting);
+                $directories[] = dirname($f);
+                if($model->album_id)
+                    $album_id_list[$model->album_id] = true;
         }
-        $directory = $models?dirname($file_paths[0]):'';
+        
         
         $result = $command->execute();
         
         if($result){
+            if(count($album_id_list)){
+                $albums = Album::find()->select('album.*, COUNT(media.id) as album_count')->leftJoin('media', 'album.id = media.album_id')->groupBy('album.id')->where(['album.id'=>array_keys($album_id_list)])->asArray()->all();
+                $album_wo_media = [];
+                foreach($albums as $album){
+                    if($album['album_count'] == 0) $album_wo_media[] = $album['id'];
+                }
+                if(!empty($album_wo_media)) Album::deleteAll(['id'=>$album_wo_media]);
+            }
             foreach($file_paths as $path){
                 @$ftp->delete($path);
             }
             foreach($thumbnail_paths as $path){
                 @$ftp->delete($path);
             }
-            if($directory && $ftp->isEmpty($directory)) 
-                $ftp->rmdir($directory);
+            foreach($directories as $directory){
+                if($directory && $ftp->isEmpty($directory)) 
+                    $ftp->remove($directory);
+            }
         }
         
         return $result;
