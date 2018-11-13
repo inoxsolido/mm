@@ -82,6 +82,7 @@ class AlbumController extends Controller
                 $ftp = new \app\components\FtpClient();
                 
                 $new_file_path = '';
+                $oldFolderName='';$newFolderName='';//declare for exception catching
                 if($album_data){//update Album Data
                     $album = Album::findOne($album_data['id']);
                     if(!$album){//Incorrect Album Id
@@ -110,6 +111,28 @@ class AlbumController extends Controller
                         }
                     }
                     $album->tags = $album_data['tags'];
+                    $transaction = Yii::$app->db->beginTransaction();
+                    try{
+                        if(!$album->save()){
+                            throw new \Exception("บันทึกข้อมูลอัลบั้มไม่สำเร็จ");
+                        }
+                        //update all medias file_path 
+                        if(!Media::updateAll(['file_path'=>"Image/{$album->name}"], ['album_id'=>$album->id])){
+                            throw new \Exception("Error while updating Medias that related with this album.");
+                        }
+                        $transaction->commit();
+                        
+                    } catch (\Exception $ex) {
+                        $transaction->rollback();
+                        //rename folder back
+                        if($newFolderName != ''){
+                            if($ftp->isDir($newFolderName)){
+                                $ftp->rename($newFolderName, $oldFolderName);
+                            }
+                        }
+                        Yii::$app->response->statusCode = 500;
+                        return $ex->getMessage();
+                    }
                     if(!$album->save()){
                         Yii::$app->response->statusCode = 500;
                         return "บันทึกข้อมูลอัลบั้มไม่สำเร็จ";
@@ -150,10 +173,9 @@ class AlbumController extends Controller
                                 if($m->name != $old_name){
                                     
                                     $m->file_name = $m->getNewFileName();
-                                    $m->file_thumbnail_path = 'thumbnails/thumbnail_'. $m->file_name.'.jpeg';
                                     $newFtpPath = $m->getFtpPath($setting);
                                     $newThumbnail = $m->getThumbnailFtpPath($setting);
-                                    if($m->validate() && $ftp->rename($oldFtpPath,$newFtpPath) && $ftp->rename($oldThumbnail, $newThumbnail)){
+                                    if($m->validate() && $ftp->rename($oldFtpPath,$newFtpPath)){
                                         
                                         if(!$m->save(false)){
                                             Yii::$app->response->statusCode = 500;
@@ -162,7 +184,6 @@ class AlbumController extends Controller
                                     }else{
                                         //try to rename back
                                         $ftp->rename($newFtpPath, $oldFtpPath);
-                                        $ftp->rename($newThumbnail, $oldThumbnail);
                                         Yii::$app->response->statusCode = 500;
                                         return "ไม่สามารถเปลี่ยนชื่อไฟล์ $old_name ได้";
                                     }
@@ -227,32 +248,24 @@ class AlbumController extends Controller
      * @return mixed
      */
     public function actionDeleteSelectedMedia(){
-        if(Yii::$app->request->isPost){
-            if(Yii::$app->user->isGuest !== true){
-                $media_id_set = Yii::$app->request->post("media_id_set");
-                if(Empty($media_id_set)){
-                    Yii::$app->response->statusCode = 400;
-                    return 'Media set is missing!.';
-                }
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-                    Media::deleteAll(['id' => $media_id_set]);
-                    $transaction->commit();
-                    Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
-                }catch(Exception $e){
-                    $transaction->rollBack();
-                    Yii::$app->response->statusCode = 500;
-                    Yii::$app->response->statusText = $e->getMessage();
-                    return Yii::$app->response->statusText;
-                }
-            }else{
-                Yii::$app->response->setStatusCode(401);
-                return Yii::$app->response->statusText;
-            }
-        }else{
-            Yii::$app->response->setStatusCode(405);
+ 
+        $media_id_set = Yii::$app->request->post("media_id_set");
+        if(Empty($media_id_set)){
+            Yii::$app->response->statusCode = 400;
+            return 'Media set is missing!.';
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Media::deleteAll(['id' => $media_id_set]);
+            $transaction->commit();
+            Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
+        }catch(Exception $e){
+            $transaction->rollBack();
+            Yii::$app->response->statusCode = 500;
+            Yii::$app->response->statusText = $e->getMessage();
             return Yii::$app->response->statusText;
         }
+            
     }
     /**
      * Deletes an existing Album model.
