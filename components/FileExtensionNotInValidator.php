@@ -121,7 +121,10 @@ class FileExtensionNotInValidator extends \yii\validators\FileValidator{
         $jsonExtension_list = json_encode($extension_list);
         return <<<JS
             var extension = /\.\w+$/.exec(value);
-            if(extension != null) extension = String(extension).toLowerCase();
+            if(extension != null){ 
+                extension = String(extension).toLowerCase(); 
+                extension = extension.replace('.','');
+            }
             if ( $.inArray(extension, $jsonExtension_list) != -1 ) {
                 messages.push('This file not allowed on this uploader.');
             }
