@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'header'=>'<input id="check-main-all" type="checkbox" class="check-main-all"/>',
                 'headerOptions' => ['style'=>['text-align'=>'center']],
-                'value' => function(){return '<input type="checkbox" class="check-main"/>';},
+                'value' => function($model){return '<input type="checkbox" class="check-main" value="'.$model->id.'"/>';},
                 'format' => 'raw'
             ],
             [
@@ -329,6 +329,7 @@ $this->params['breadcrumbs'][] = $this->title;
             return false;
         }else{
             if(!confirm('Are you sure you want to delete these item?')) return false;
+            $("#loading").show();
             media_id_set = $.map(media_checked, function(media){
                 return $(media).val();
             });
@@ -337,7 +338,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 type: "POST",
                 async: false,
                 data:{
-                    _csrf: csrfToken,
                     media_id_set: media_id_set
                 }
             }).done(function(data, textStatus, jqXHR){
