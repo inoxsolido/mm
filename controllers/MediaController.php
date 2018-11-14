@@ -183,6 +183,11 @@ class MediaController extends Controller
             Yii::$app->response->statusCode = 400;
             return 'Media set is missing!.';
         }
+        $count = Media::find()->where(['id'=> $media_id_set])->count();
+        if(!$count) {
+            Yii::$app->response->statusCode = 400;
+            return "Invalid media set";
+        }
         $transaction = Yii::$app->db->beginTransaction();
         try {
             Media::deleteAll(['id' => $media_id_set]);
