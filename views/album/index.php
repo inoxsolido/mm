@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'album_id',
                 'value' => function($model){
                     if(@$model->name != null)
-                        return Html::a($model->name, Url::to(['media/index','MediaSearch[album_id'=>$model->name]));
+                        return Html::a($model->name, Url::to(['media/index','MediaSearch[album_id]'=>$model->name]));
                     return null;
                 },
                 'format'=>'html',
