@@ -20,7 +20,15 @@ app\assets\JqueryAutoCompleteAsset::register($this);
     .caption.pull-left{
         display: inline-block;
         width: calc(100% - 210px);
+        height:18px;
     }
+    .caption p {
+        display:inline-block;
+        width:100%;
+        height:18px;
+        overflow:hidden;
+    }
+    
     
 </style>
 <div class="search-main">

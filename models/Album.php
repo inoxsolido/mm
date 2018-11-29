@@ -33,7 +33,7 @@ class Album extends \yii\db\ActiveRecord
         $rules = [
             [['name'], 'required'],
             [['tags'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 80],
             [['name'], 'unique',
                 'message' => '{attribute} {value} มีอยู่แล้วในระบบ'
             ],
