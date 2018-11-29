@@ -113,7 +113,10 @@ $(function(){
         //clear old thumbnail data
         $("input[name=thumbnails\\[\\]]").remove();
         //add new data;
-        console.log(addThumbnailToForm());
+        addThumbnailToForm();
+        $(window).on("beforeunload", function(){
+            return "Bye";
+        });
     });
     function addThumbnailToForm(){
         var thumbnail_data = [];
@@ -266,7 +269,6 @@ $(function(){
             });
         }
     });
-    
 });
 </script>
 <?php JSRegister::end(); ?>

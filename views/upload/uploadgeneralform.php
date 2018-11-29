@@ -100,7 +100,9 @@ $(function(){
             
             if($("#media-name").val() == '') $("#media-name").val($(this).val().split(/(\\|\/)/g).pop());
         }else{
-            
+            $(window).on("beforeunload", function(){
+                return "Bye";
+            });
         }
     });
     //--
@@ -173,8 +175,7 @@ $(function(){
             
         }
     });
-    
-    
+   
     
 });    
 </script>

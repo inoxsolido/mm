@@ -133,6 +133,9 @@ use yii\helpers\Url;
             $("#btnusethumbnail").show();
             
             if($("#media-name").val() == '') $("#media-name").val($(this).val().split(/(\\|\/)/g).pop());
+            $(window).on("beforeunload", function(){
+                return "Bye";
+            });
         }else{
             $(this).parents('.input-group').find('.file-caption-name').text("");
             $("#btnusethumbnail").hide();
@@ -302,8 +305,7 @@ use yii\helpers\Url;
         }
     });
     //--end form
-    
-    
+
     
 });
 
