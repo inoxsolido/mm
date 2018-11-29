@@ -30,7 +30,7 @@ $setting = \app\models\Settings::getSetting();
                    data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
                    data-type="<?=$model['media_type_id']?>" 
                    data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>">
-       ><img class="" src="<?=$model->getThumbnailHttpPath()?>" style="height:300px; width:auto;"/><span class="tooltiptext">Click to preview.</span></a>
+       <img class="" src="<?=$model->getThumbnailHttpPath()?>" style="height:300px; width:auto;"/><span class="tooltiptext">Click to preview.</span></a>
     <!-- THUMBNAIL -->
     <?php if ($model->media_type_id != 2): ?>
         <?=
