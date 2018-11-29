@@ -103,7 +103,7 @@ for($i=0; $i < count($resultModel); $i++){
             <a class="pull-left thumbnail-slide-container" href="#" style="display:inline-block">
                 <?php foreach($model['media'] as $media): ?>
                 <?php /* @var $media \app\models\Media */ ?>
-                <img class="thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
+                <center><img class="thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/></center>
                 <?php endforeach; ?>
             </a>
             <span class="caption pull-left">
