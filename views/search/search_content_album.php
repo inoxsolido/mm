@@ -22,6 +22,13 @@ for($i=0; $i < count($resultModel); $i++){
         width:auto;
         text-align: center;
     }
+    .thumbnail > .thumbnail-img > a {
+            display: inline-block;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
     .thumbnail > .thumbnail-img > a > img {
         position: relative;
         display:block;
