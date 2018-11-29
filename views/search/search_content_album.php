@@ -103,7 +103,7 @@ for($i=0; $i < count($resultModel); $i++){
             <a class="pull-left thumbnail-slide-container" href="#" style="display:inline-block">
                 <?php foreach($model['media'] as $media): ?>
                 <?php /* @var $media \app\models\Media */ ?>
-                <center><img class="thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/></center>
+                <img class="thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
                 <?php endforeach; ?>
             </a>
             <span class="caption pull-left">
@@ -129,7 +129,7 @@ for($i=0; $i < count($resultModel); $i++){
                     <a href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>">
                         <?php foreach($model['media'] as $media): ?>
                         <?php /* @var $media \app\models\Media */ ?>
-                        <img class="pull-left thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
+                        <center><img class="pull-left thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/></center>
                         <?php endforeach; ?>
                     </a>
                 </div>
