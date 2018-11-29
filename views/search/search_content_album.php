@@ -129,7 +129,7 @@ for($i=0; $i < count($resultModel); $i++){
                     <a href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>">
                         <?php foreach($model['media'] as $media): ?>
                         <?php /* @var $media \app\models\Media */ ?>
-                        <img class="thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
+                        <img class="pull-left thumbnail-slide" src="<?=$media->getThumbnailHttpPath($setting)?>"/>
                         <?php endforeach; ?>
                     </a>
                 </div>
