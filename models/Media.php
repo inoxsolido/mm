@@ -65,7 +65,7 @@ class Media extends \yii\db\ActiveRecord
             
             [['media_file'], 'required', 'on'=>['create','video','other']],
             [['thumbnail_file'], \app\components\RequiredWhenOneEmptyValidator::className(), 'emptyAttribute'=>'thumbnail_from_video', 'on'=>'video'],
-            [['thumbnail_file'], 'required', 'on'=>'other'],
+//            [['thumbnail_file'], 'required', 'on'=>'other'],
             
         ];
         //optimizer lowest query

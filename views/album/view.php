@@ -16,7 +16,17 @@ $this->title = $album->name;
 //$this->params['breadcrumbs'][] = ['label' => 'Album', 'url' => ['index']];
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
-
+<style>
+    .thumbnail > a > img{
+        height: 168.75px;
+    }
+    .caption > h4{
+        display:inline-block;
+        width:100%;
+        height:18px;
+        overflow:hidden;
+    }
+</style>
 <div id="player-backdrop" class="player-back-drop" style="display:none;"></div>
 <div id="player" class="player" style="display:none;">
     <div class="player-header">
@@ -77,7 +87,7 @@ $this->title = $album->name;
                 </a>
             </div>
             <div class="caption">
-                <h4><a class="previewable" data-id="<?=$model['id']?>" data-tags="<?= $model['tags'] ?>" data-name="<?= $model['name'] ?>" data-album_name="" data-album_link="" data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" data-type="<?=$model['media_type_id']?>" data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
+                <h4><a class="previewable" title="<?=$model['name']?>" data-id="<?=$model['id']?>" data-tags="<?= $model['tags'] ?>" data-name="<?= $model['name'] ?>" data-album_name="" data-album_link="" data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" data-type="<?=$model['media_type_id']?>" data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
                 <p>Upload: <?=Yii::$app->utility->strDateReformat($model['file_upload_date'], 'd/m/Y H:i') ?></p>
             </div>
         </div>

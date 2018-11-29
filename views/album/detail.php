@@ -14,6 +14,17 @@ $this->title = $album->name;
 $this->params['breadcrumbs'][] = ['label' => 'Album', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style>
+    .thumbnail > a > img{
+        height: 168.75px;
+    }
+    .caption > h4{
+        display:inline-block;
+        width:100%;
+        height:18px;
+        overflow:hidden;
+    }
+</style>
 <h1><?= Html::encode($this->title) ?></h1>
 <?= DetailView::widget([
     'model' => $album,
@@ -47,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <a href="#"><img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" alt=""/></a>
             </div>
             <div class="caption">
-                <h4><a class="previewable title" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 
+                <h4><a class="previewable title" title="<?=$model['name']?>" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 
                    data-album_name ="" data-album_link=""
                    data-tags="<?= $model['tags'] ?>"  
                    data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
