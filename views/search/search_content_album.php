@@ -17,10 +17,12 @@ for($i=0; $i < count($resultModel); $i++){
 <!-- TABLE CONTENT -->
 <style>
     .thumbnail > .thumbnail-img {
-        height: 200px;
+        /*height: 200px;*/
+        max-width:100%;
+        width:auto;
     }
     .thumbnail > .thumbnail-img > a > img {
-        height: 200px;
+        /*height: 200px;*/
     }
     
     .content-list > .row {
