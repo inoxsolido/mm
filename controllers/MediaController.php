@@ -193,7 +193,7 @@ class MediaController extends Controller
             Media::deleteAll(['id' => $media_id_set]);
             $transaction->commit();
             Yii::$app->session->setFlash("success", "ลบข้อมูลสำเร็จ");
-        }catch(Exception $e){
+        }catch(\Exception $e){
             $transaction->rollBack();
             Yii::$app->response->statusCode = 500;
             Yii::$app->response->statusText = $e->getMessage();
