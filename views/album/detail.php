@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Album', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <style>
-    .thumbnail > a > img{
+    .thumbnail a > img{
         height: 168.75px;
     }
     .caption > h4{

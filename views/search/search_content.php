@@ -73,7 +73,7 @@ $resultModel = $dataProvider->getModels();
         <div class="row">
             <img class="pull-left" src="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" />
             <span class="caption pull-left">
-                <a class="previewable title" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 
+                <a class="previewable title" title="<?= $model['name'] ?>" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 
                    data-tags="<?= $model['tags'] ?>" 
                    data-album_name="<?= $model['album_name'] ?>" data-album_link="<?= Url::to(['/album/view','id'=>$model['album_id']])?>" 
                    data-poster="<?= Media::generateThumbnailHttp($model['file_thumbnail_path'], $setting) ?>" 
@@ -114,7 +114,7 @@ $resultModel = $dataProvider->getModels();
                     </a>
                 </div>
                 <div class="caption">
-                    <h4><a class="previewable" data-id="<?=$model['id']?>" 
+                    <h4><a class="previewable" title="<?= $model['name'] ?>" data-id="<?=$model['id']?>" 
                            data-tags="<?= $model['tags'] ?>" 
                            data-name="<?= $model['name'] ?>" 
                            data-album_name="<?= $model['album_name'] ?>" 

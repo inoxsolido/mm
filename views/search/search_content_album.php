@@ -98,8 +98,8 @@ for($i=0; $i < count($resultModel); $i++){
                 <?php endforeach; ?>
             </a>
             <span class="caption pull-left">
-                <a class="title" href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a>
-                <p><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
+                <a class="title" title="<?=$model['name']?>" href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a>
+                <p style="height:40px; overflow:hidden"><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
             </span>
             
         </div>
@@ -125,8 +125,8 @@ for($i=0; $i < count($resultModel); $i++){
                     </a>
                 </div>
                 <div class="caption">
-                    <h4><a href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a></h4>
-                    <p><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
+                    <h4><a title="<?=$model['name']?>" href="<?= Url::to(['/album/view','id'=>$model['id']]) ?>"><?=$model['name']?></a></h4>
+                    <p style="height:40px; overflow:hidden"><span>Tag: <?php foreach($tags as $tag): ?><a href="<?= Url::to(['search/index','q'=>$tag,'omediatag'=>1,'oalbumtag'=>1])?>"><?=$tag?></a>&nbsp;<?php endforeach; ?></span></p>
                 </div>
             </div>
         </div>

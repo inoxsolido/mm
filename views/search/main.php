@@ -7,6 +7,22 @@ use yii\helpers\Url;
 app\assets\JqueryAutoCompleteAsset::register($this);
 \app\assets\PlyrAsset::register($this);
 ?>
+<style>
+    .thumbnail a > img{
+        height: 112.5px;
+    }
+    .caption > h4{
+        display:inline-block;
+        width:100%;
+        height:18px;
+        overflow:hidden;
+    }
+    .caption.pull-left{
+        display: inline-block;
+        width: calc(100% - 210px);
+    }
+    
+</style>
 <div class="search-main">
     <center>
     <div class="section-search-box" style="display:inline-block; min-width:500px; max-width:50%;">
