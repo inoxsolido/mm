@@ -176,9 +176,9 @@ use yii\helpers\Url;
     function snap() {
             if(!$("#media-media_file").val()){ errorPopUp('Please choose file before.'); return false;}
             // Define the size of the rectangle that will be filled (basically the entire element)
-            context.fillRect(0, 0, w, h);
+//            context.fillRect(0, 0, w, h);
             // Grab the image from the video
-            context.drawImage(video, 0, 0, w, h);
+//            context.drawImage(video, 0, 0, w, h);
             width_lim = 300,//px
             ratio = 9/16,//for height*3
             height_lim = ratio * width_lim,
@@ -197,7 +197,7 @@ use yii\helpers\Url;
             canvas.height = height - y;
             
             context = canvas.getContext('2d');
-            context.drawImage(image, 0, -(y/2), width, height);
+            context.drawImage(video, 0, -(y/2), width, height);
             
             
 //            var canvas = $("#thumbnail-canvas")[0];
