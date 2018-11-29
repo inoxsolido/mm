@@ -20,12 +20,15 @@ for($i=0; $i < count($resultModel); $i++){
         height: 200px;
         max-width:100%;
         width:auto;
+        text-align: center;
     }
     .thumbnail > .thumbnail-img > a > img {
         position: relative;
-        width: -moz-available;          /* WebKit-based browsers will ignore this. */
-        width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
-        width: fill-available;
+        display:block;
+/*        width: -moz-available;           WebKit-based browsers will ignore this. 
+        width: -webkit-fill-available;   Mozilla-based browsers will ignore this. 
+        width: fill-available;*/
+        width:auto;
         height: 100%;
     }
     
