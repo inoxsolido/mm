@@ -43,6 +43,11 @@ $setting = \app\models\Settings::getSetting();
                 'browseClass' => 'btn btn-primary ',
                 'browseIcon' => '<i class="glyphicon glyphicon-camera"></i> ',
                 'browseLabel' => 'เลือกภาพตัวอย่างใหม่',
+                'maxImageWidth' => 300,
+                'maxImageHeight' => 168.75,
+                'resizePreference' => 'height',
+                'maxFileCount' => 1,
+                'resizeImage' => true,
                 'initialPreview' => [
                     "<img src='" . $model->getThumbnailHttpPath() . "' style='width:100%' class='file-preview-image' >",
                 ],
