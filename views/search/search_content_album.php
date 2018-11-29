@@ -23,7 +23,7 @@ for($i=0; $i < count($resultModel); $i++){
     }
     .thumbnail > .thumbnail-img > a > img {
         position: relative;
-        width: 100%;
+        width: auto;
         height: 100%;
     }
     
