@@ -36,7 +36,7 @@ $setting = \app\models\Settings::getSetting();
         <?=
         $form->field($model, 'thumbnail_file', ['enableAjaxValidation' => false])->widget(FileInput::classname(), [
             'pluginOptions' => [
-                'showPreview' => true,
+                'showPreview' => false,
                 'showCaption' => true,
                 'showRemove' => false,
                 'showUpload' => false,
@@ -314,6 +314,7 @@ $setting = \app\models\Settings::getSetting();
         }
     });
     $("#player").on("click", ".player-close", function(){
+        $("#player").find(".player-media-wrapper").html('');
         $("#player-backdrop").hide();
         $("#player").hide();
         window.location.hash = "";
