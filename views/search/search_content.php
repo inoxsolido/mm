@@ -124,7 +124,7 @@ $resultModel = $dataProvider->getModels();
                            data-flink="<?= Media::generateFileHttp($model['file_path'], $model['file_name'], $model['file_extension'], $setting) ?>" 
                            href="#<?=$model['id']?>"><?=$model['name']?></a></h4>
                     <?php if($model['album_id']):?>
-                    <p>Album: <a href="<?=Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a></p>
+                    <p>Album: <a title="<?=$model['album_name']?>" href="<?=Url::to(['album/view','id'=>$model['album_id']])?>"><?=$model['album_name']?></a></p>
                     <?php else: ?>
                     <p>&nbsp;</p>
                     <?php endif; ?>
