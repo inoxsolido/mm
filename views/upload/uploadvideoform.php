@@ -179,8 +179,28 @@ use yii\helpers\Url;
             context.fillRect(0, 0, w, h);
             // Grab the image from the video
             context.drawImage(video, 0, 0, w, h);
+            width_lim = 300,//px
+            ratio = 9/16,//for height*3
+            height_lim = ratio * width_lim,
+            width = w,
+            height = h,
+            x=0,y=0;
+            if(width > width_lim){
+                width = width_lim;
+                height = height * (width_lim/w) ;
+            }
+            if(height > height_lim){//still more than limit
+                //crop only y
+                 y = height - height_lim;//eg.112.5 - 200
+            }
+            canvas.width = width;
+            canvas.height = height - y;
             
-            var canvas = $("#thumbnail-canvas")[0];
+            context = canvas.getContext('2d');
+            context.drawImage(image, 0, -(y/2), width, height);
+            
+            
+//            var canvas = $("#thumbnail-canvas")[0];
             $("#media-thumbnail_file").val("");//clear file input
             $("#img-el").parent().find(".file-caption-name").text("");
             $("#thumbnail_from_video").val(canvas.toDataURL('image/jpeg',0.75)); //put file to hidden input
