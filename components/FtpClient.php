@@ -169,4 +169,69 @@ class FtpClient extends \yii2mod\ftp\FtpClient
 
         return $result;
     }
+    
+    public function scanDir($directory = '.', $recursive = false, $includeHidden = false)
+    {
+         return $this->parseRawList($this->rawlist($directory, $recursive, $includeHidden));
+    }
+    
+    public function rawlist($directory = '.', $recursive = false, $includeHidden = false)
+    {
+        if (!$this->isDir($directory)) {
+            throw new FtpException('"' . $directory . '" is not a directory.');
+        }
+
+        if ($includeHidden) {
+            $directory = "-la $directory";
+        }
+
+        $list = $this->getWrapper()->rawlist($directory);
+        $items = [];
+        if (false == $recursive) {
+            foreach ($list as $path => $item) {
+                $chunks = preg_split("/\s+/", $item, 9);
+                // if not "name"
+                if (empty($chunks[8]) || $chunks[8] == '.' || $chunks[8] == '..') {
+                    continue;
+                }
+                $path = $directory . '/' . $chunks[8];
+                if (substr($path, 0, 2) == './') {
+                    $path = substr($path, 2);
+                }
+                $items[$this->rawToType($item) . '#' . $path] = $item;
+            }
+
+            return $items;
+        }
+        
+        foreach ($list as $item) {
+            $len = strlen($item);
+            if (!$len
+                // "."
+                || ($item[$len - 1] == '.' && $item[$len - 2] == ' '
+                    // ".."
+                    or $item[$len - 1] == '.' && $item[$len - 2] == '.' && $item[$len - 3] == ' ')
+            ) {
+                continue;
+            }
+            $chunks = preg_split("/\s+/", $item, 9);
+            // if not "name"
+            if (empty($chunks[8]) || $chunks[8] == '.' || $chunks[8] == '..') {
+                continue;
+            }
+            $path = $directory . '/' . $chunks[8];
+            if (substr($path, 0, 2) == './') {
+                $path = substr($path, 2);
+            }
+            $items[$this->rawToType($item) . '#' . $path] = $item;
+            if ($item[0] == 'd') {
+                $sublist = $this->rawlist($path, true);
+                foreach ($sublist as $subpath => $subitem) {
+                    $items[$subpath] = $subitem;
+                }
+            }
+        }
+
+        return $items;
+    }
 }
