@@ -75,9 +75,18 @@ class MediaSearch extends Media {
             ]);
             return $dataProvider;
         }
+        
+        
         //-----keyword search
         //update frequency word
         Yii::$app->word->frequencyWordToDictionary($params['q']);//update
+        if(@$params['oq'] != null){
+            //cross related word
+            $params['oq'] = trim($params['oq']);
+            $params['oq'] = preg_replace('/[~!@#$%^&*()_+\/\-*\/\.,\?\[\]\|:;"\'\\\\<>\{\}]/', '', $params['oq']);
+            $splited_oq = Yii::$app->word->split($params['oq']);
+            Yii::$app->word->updateRelationWord($splited_q, $splited_oq);
+        }
         
         $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
         $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้

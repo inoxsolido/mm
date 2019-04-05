@@ -92,12 +92,12 @@ class SearchController extends Controller {
      * @return mixed
      */
     public function actionAlbum(){
-        
+        $params = Yii::$app->request->post();
         $q = Yii::$app->request->get('q');
         if(Yii::$app->request->isAjax){return 'ajaxajx';}
         else{
             $searchModel = new \app\models\AlbumSearch();
-            $dataProvider = $searchModel->search($q);
+            $dataProvider = $searchModel->search($params);
             return $this->render('/search/main_album', [
                     'dataProvider' => $dataProvider,
                     'setting' => Settings::getSetting(),

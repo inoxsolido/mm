@@ -78,4 +78,12 @@ class FrequencyRelation extends \yii\db\ActiveRecord
         $related_word = Yii::$app->db->createCommand($sql)->queryColumn('word');
         return $related_word;
     }
+    
+    static function findByWords($word1,$word2){
+        return self::find()
+                ->orWhere(['and',['word1'=>$word1], ['word2'=>$word2]])
+                ->orWhere(['and',['word1'=>$word2], ['word2'=>$word1]])
+                ->one();
+    }
+    
 }

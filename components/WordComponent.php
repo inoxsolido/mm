@@ -2,14 +2,86 @@
 
 namespace app\components;
 
+use Yii;
 use yii\base\Component;
 use app\models\Settings;
 use app\models\FrequencyWord;
 use app\models\Dictionary;
+use app\models\FrequencyRelation;
 
 class WordComponent extends Component
 {
-
+    /*
+     * This method use to updateRelationWord's counter
+     * @param array $splited_q present query splited word 
+     * @param array $splited_oq previous query splited word
+     */
+//    public function updateRelationWord($splited_q, $splited_oq){
+//        $related_word_query = "INSERT INTO relation_word ";
+//        $value_counter = 0;
+//        $related_word_query_values = [];
+//
+//        foreach($splited_q as $kq => $vq){
+//            for($i=$kq+1; $i<count($splited_oq); $i++){
+//                if($value_counter > 0) $related_word_query .= ",";
+//                $related_word_query .= "(\"$vq\", \"{$splited_q[$i]}\")";
+//                $value_counter+=1;
+//            }
+//            foreach($splited_oq as $koq => $voq){
+//                if($value_counter > 0) $related_word_query .= ",";
+//                $related_word_query .= "(\"$vq\", \"$voq\")";
+//                $value_counter+=1;
+//            }
+//        }
+//        return $related_word_query;
+//        return Yii::$app->getDb()->createCommand($related_word_query)->execute();
+//    }
+    public function updateRelationWord($splited_q, $splited_oq = []){
+        if(!$splited_oq) $splited_oq = [];
+        $i = 0;
+        foreach($splited_q as $kq => $vq){
+            $i=$kq+1;
+            if($i<count($splited_q))
+            {
+                $self_relation = FrequencyRelation::findByWords($vq, $splited_q[$i]);
+                if(!$self_relation) {
+                    $self_relation = new FrequencyRelation;
+                    $self_relation->word1 = $vq;
+                    $self_relation->word2 = $splited_q[$i];
+                    $self_relation->frequency = 1;
+                    $self_relation->save(false);
+                }else{
+                    $self_relation->updateCounters(['frequency'=>1]);
+                }
+                
+            }
+            foreach($splited_oq as $koq => $voq){
+                $cross_relation = FrequencyRelation::findByWords($vq, $voq);
+                if(!$cross_relation){
+                    $cross_relation = new FrequencyRelation;
+                    $cross_relation->word1 = $vq;
+                    $cross_relation->word2 = $voq;
+                    $cross_relation->frequency = 1;
+                    $cross_relation->save(false);
+                }else{
+                    $cross_relation->updateCounters(['frequency'=>1]);
+                }
+                
+            }
+        }
+        for($i=0,$j=$i+1;$i<count($splited_oq)-1;$i++, $j=$i+1){
+            $self_relation = FrequencyRelation::findByWords($splited_oq[$i], $splited_oq[$j]);
+            if(!$self_relation) {
+                $self_relation = new FrequencyRelation;
+                $self_relation->word1 = $splited_oq[$i];
+                $self_relation->word2 = $splited_oq[$j];
+                $self_relation->frequency = 1;
+                $self_relation->save(false);
+            }else{
+                $self_relation->updateCounters(['frequency'=>1]);
+            }
+        }
+    }
     /**
      * This method use to update frequency word's counter and add to Dictionary
      * @param string $word query word
@@ -30,6 +102,7 @@ class WordComponent extends Component
             $wordModel->frequency = 1;
             $result = $wordModel->save();
             if(!$result) return false; //reject if fail on saving
+            return true;
         }
         if(!$wordModel->updateCounters(['frequency'=>1])) return true;
         

@@ -33,7 +33,8 @@ class AlbumSearch extends Album
     }
 
     
-    public function search($query){
+    public function search($params){
+        $query = @$params['q'];
         if(@$query != null){
             $query = trim($query);
             $query = preg_replace('/[~!@#$%^&*()_+\/\-*\/\.,\?\[\]\|:;"\'\\\\<>\{\}]/', '', $query);
@@ -49,7 +50,13 @@ class AlbumSearch extends Album
         if ($splited_q != []) {
             //update frequency word
             Yii::$app->word->frequencyWordToDictionary($query);
-            
+            if(@$params['oq'] != null){
+                //cross related word
+                $params['oq'] = trim($params['oq']);
+                $params['oq'] = preg_replace('/[~!@#$%^&*()_+\/\-*\/\.,\?\[\]\|:;"\'\\\\<>\{\}]/', '', $params['oq']);
+                $splited_oq = Yii::$app->word->split($params['oq']);
+                Yii::$app->word->updateRelationWord($splited_q, $splited_oq);
+            }
             $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
             $query2 = clone $draftQuery; //2. มีคำครบทุกคำและมีคำอื่นแทรกระหว่างประโยคได้
             $query3 = clone $draftQuery; //3. มีคำครบทุกคำแต่คำแต่ละคำจะอยู่ตรงไหนของRecordก็ได้ (and condition)

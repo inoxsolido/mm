@@ -159,17 +159,21 @@ $(window).load(function () {
         if($(".check-type:checked").length === 0) $(".check-type").prop({checked:true});
     });
     
-    function createQueryParameter(page) {
+    function createQueryParameter(page, isPageRequest = true) {
         /* OBJECTS IN ARRAY
          * query => '',
          * mediaType[] => 0-5,
          * date => '2018-05-24 12:00 AM - 2018-05-24 11:59 PM',
          * onlyAlbum => 'only', */
+        let old_query = getQuery('q');
         let form_var = $("#search").serializeArray();
+        console.log(page);
         if (!page && page !== 0)
             page = 1;
         form_var.push({name: 'p', value: page});
-
+        if(!isPageRequest){
+            form_var.push({name: 'oq', value: old_query});
+        }
         return form_var;
     }
 
@@ -210,10 +214,11 @@ $(window).load(function () {
         //copy url params to search field
         if (takeUrl) {
             $("#query").val(getQuery('q'));
+            if(getQuery('p') < 1 )$("#oq").val(getQuery('q'));
         }
         //clear old event & binding new
         $(".section-content").off();
-        $(".section-content").on("click", ".btn-page", pagination);
+//        $(".section-content").on("click", ".btn-page", pagination);
         $(".section-content").on("click", "#btntable", function () {
             changeView(this, "t");
         });

@@ -104,21 +104,27 @@ $(window).load(function () {
         if($(".check-search:checked").length === 0) $(".check-search").prop({checked:true});
     });
     
-    function createQueryParameter(page) {
+    function createQueryParameter(page, isPageRequest = true) {
         /* OBJECTS IN ARRAY
          * query => '',
          * mediaType[] => 0-5,
          * date => '2018-05-24 12:00 AM - 2018-05-24 11:59 PM',
          * onlyAlbum => 'only', */
+        let old_query = getQuery('q');
         let form_var = $("#search").serializeArray();
         console.log(page);
         if (!page && page !== 0)
             page = 1;
         form_var.push({name: 'p', value: page});
-
+        if(!isPageRequest){
+            form_var.push({name: 'oq', value: old_query});
+        }
         return form_var;
     }
-
+    function updatePrevQuery(){
+        let oq = getQuery('q');
+        
+    }
     $("#search").submit(function (event, page) {
         event.preventDefault();
         //catch submitting event 
@@ -128,9 +134,13 @@ $(window).load(function () {
          * 3. display feedback on search content (the return infomation from server 
          * will be html content by view search content(render partial))
          */
-        if (page === undefined)
+        let isPageRequest = true;
+        if (page === undefined){
             page = 1;
-        let form_var = createQueryParameter(page);
+            isPageRequest = false;
+        }
+        let data = createQueryParameter(page - 1, isPageRequest);
+        let form_var = createQueryParameter(page, isPageRequest);;
         let new_url = "?";
         if (form_var != '') {
             new_url = "?q=" + form_var[0].value;
@@ -149,13 +159,14 @@ $(window).load(function () {
             url: this.action,
             method: 'POST', // "POST", "GET", "PUT" 
             async: true,
-            data: createQueryParameter(page - 1),
+            data: data,
             beforeSend: function () {
                 $("#loading").show();
             },
             success: function (data, textStatus, jqXHR) {
                 $(".section-content").html(data);
                 main();
+                
             },
             error: function (jqXHR, textStatus, errorThrown) {},
             complete: function (jqXHR, textStatus) {
