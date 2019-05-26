@@ -44,7 +44,7 @@ class CronController extends Controller
             }
             
         }catch(\Exception $e){
-            echo "Exception Error: $e->getMessage())";
+            echo "Exception Error: ".$e->getMessage();
         }
     }
 }
