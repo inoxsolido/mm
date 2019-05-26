@@ -85,5 +85,27 @@ class FrequencyRelation extends \yii\db\ActiveRecord
                 ->orWhere(['and',['word1'=>$word2], ['word2'=>$word1]])
                 ->one();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            // Place your custom code here
+            //if word1 or word2 not in media_word
+            if(!MediaWord::isMediaWord($this->word1)){
+                $this->addError("word1", "คำนี้ไม่เกี่ยวข้องกับสื่อ");
+                return false;
+            }
+            if(!MediaWord::isMediaWord($this->word2)){
+                $this->addError("word2", "คำนี้ไม่เกี่ยวข้องกับสื่อ");
+                return false;    
+            } 
+            return true;
+        } else {
+            return false;
+        }
+    }
     
 }

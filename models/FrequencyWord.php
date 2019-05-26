@@ -46,4 +46,22 @@ class FrequencyWord extends \yii\db\ActiveRecord
             'frequency' => 'ความถี่',
         ];
     }
+    
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            // Place your custom code here
+            //if word1 or word2 not in media_word
+            if(!MediaWord::isMediaWord($this->word)){
+                $this->addError("word", "คำนี้ไม่เกี่ยวข้องกับสื่อ");
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -88,4 +88,11 @@ class Album extends \yii\db\ActiveRecord
         }
         
     }
+
+    public function afterSave($insert, $changedAttribute){
+        parent::afterSave($insert, $changedAttribute);
+
+        MediaWord::createMediaWordByName($this->name);
+        MediaWord::createMediaWordByTags($this->tags);
+    }
 }

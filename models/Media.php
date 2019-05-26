@@ -368,5 +368,12 @@ class Media extends \yii\db\ActiveRecord
         return $result;
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        MediaWord::createMediaWordByName($this->name);
+        MediaWord::createMediaWordByTags($this->tags);
+    }
 
 }

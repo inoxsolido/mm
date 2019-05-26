@@ -5,6 +5,7 @@ use yii\web\Controller;
 use app\models\MediaType;
 use app\models\Media;
 use app\models\Album;
+use app\models\MediaWord;
 use yii\web\Response;
 use Exception;
 use Yii;
@@ -82,7 +83,6 @@ class UploadController extends Controller{
                 else
                     $m_album_id = $m_album->getIdByName();
                 
-                
                 $ftp = new \app\components\FtpClient();
                 $ftp->connect($setting->ftp_host);
                 $ftp->login($setting->ftp_user, $setting->getRealFtpPassword());
@@ -102,7 +102,7 @@ class UploadController extends Controller{
                     $media->file_name = $media->getNewFileName();
                     $media->file_extension = '.' . $file->getExtension();
                     
-                    $media->thumbnail_from_video = $thumbnails[$key];
+                    $media->thumbnail_from_video = $thumbnails[$key];//data url
                     $temp_path = "uploads/temp/" . Yii::$app->getSecurity()->generateRandomString(4);
                     $real_temp_path = Yii::getAlias("@realwebroot/$temp_path");
                     $real_temp_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $real_temp_path);
