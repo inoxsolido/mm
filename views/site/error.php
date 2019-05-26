@@ -15,6 +15,9 @@ $this->title = $name;
 
     <div class="alert alert-danger">
         <?= nl2br(Html::encode($message)) ?>
+<!--        <pre>
+            <?php Yii::$app->utility->debug($exception->getPrevious(),false,false); ?>
+        </pre>-->
     </div>
 
 </div>
