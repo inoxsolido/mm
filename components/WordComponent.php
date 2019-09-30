@@ -146,7 +146,7 @@ class WordComponent extends Component
                 $match_result[] = [$word['word'],$pos];
             }
         }
-        
+        unset($dictionary);//memory optimization
         
         if(empty($match_result)) return [$subject];
         
@@ -155,11 +155,13 @@ class WordComponent extends Component
         if($mismatch_result) $mismatch_result = $mismatch_result[0];//remove array dimension
 //        print_r($mismatch_result);
         $merged_result = array_merge($match_result,$mismatch_result);
+        unset($mismatch_result);//memory optimization
         uasort($merged_result, function($a,$b){ return $a[1]-$b[1]; });//sort result by index ASC
         
         $words = array_map(function($key){
                 return $key[0];
             }, $merged_result);
+        unset($merged_result);//memory optimization
         $words = array_values($words);
         return $words;
     }

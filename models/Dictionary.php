@@ -73,7 +73,7 @@ class Dictionary extends \yii\db\ActiveRecord
             $names = $media_name->union($album_name)->asArray()->all();//2 dimensions array
             $media_tags = Media::find()->select(['tags']);
             $album_tags = Media::find()->select(['tags']);
-            $tags = $media_tags->union($album_tags)->asArray()->all();// 2 dimensions array
+            
             //convert results to 1 dimension array
             $result_1 = [];
             $result_2 = [];
@@ -81,21 +81,32 @@ class Dictionary extends \yii\db\ActiveRecord
                 
                 $splitted = Yii::$app->word->split($value['name']);
                 if($splitted) $result_1 = array_merge($result_1, $splitted);
+                unset($splitted);//memory optimization
+                unset($names[$key]);//memory optimization
             }
+            
+            $tags = $media_tags->union($album_tags)->asArray()->all();// 2 dimensions array
             foreach ($tags as $key => $value) {
                 $splitted = explode(",",$value['tags']);
                 if(count($splitted)) array_merge($result_2, $splitted);
             }
             $result = array_merge($result_1, $result_2);
-            if(!count($result)){
-                MediaWord::deleteAll();
+            unset($result_1);//memory optimization
+            unset($result_2);//memory optimization
+            if(!count($result)){//ถ้าไม่มีในไฟล์สื่อทั้งหมด ไม่มีคำ(ไม่มีชื่อไม่มีtag)เลย
+                MediaWord::deleteAll();//ให้ลบ media_word ทิ้งทั้งหมด
+            }else{
+                // $media_words = MediaWord::find()->all();
+                // foreach ($media_words as $mword){
+                //     if(!in_array($mword->word, $result)){
+                //         $mword->delete();
+                //     }
+                // }
+                //transform to delete from media_word where word in($result);//$result ant,bird,cat,dog
+                MediaWord::deleteAll(['in', 'word', $result]);
             }
-            $media_words = MediaWord::find()->all();
-            foreach ($media_words as $mword){
-                if(!in_array($mword->word, $result)){
-                    $mword->delete();
-                }
-            }
+            
+            
             $transaction->commit();
             return true;
         }catch(\Exception $e){
