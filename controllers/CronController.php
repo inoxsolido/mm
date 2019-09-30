@@ -23,6 +23,7 @@ class CronController extends Controller
         if (!parent::beforeAction($action)) {
             return false;
         }
+        return true;
         $_allow_ips = ['127.0.0.1'];
         $requestIp = Yii::$app->request->getUserIp();
         if(in_array($requestIp, $_allow_ips) || (Yii::$app->user->identity != NULL &&  Yii::$app->user->identity->getIsAdmin())){

@@ -103,7 +103,7 @@ class Dictionary extends \yii\db\ActiveRecord
                 //     }
                 // }
                 //transform to delete from media_word where word in($result);//$result ant,bird,cat,dog
-                MediaWord::deleteAll(['in', 'word', $result]);
+                MediaWord::deleteAll(['not in', 'word', $result]);
             }
             
             
