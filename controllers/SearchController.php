@@ -8,9 +8,11 @@ use yii\web\Controller;
 use app\models\MediaSearch;
 use app\models\Dictionary;
 use app\models\Settings;
+use app\models\MediaWord;
 
 use yii\filters\AccessControl;
 use app\components\AjaxFilter;
+use yii\web\Session;
 
 
 class SearchController extends Controller {
@@ -81,7 +83,7 @@ class SearchController extends Controller {
         $dataProvider->getPagination()->setPage(@$params['p']);
 //        $queryParams = Yii::$app->request->queryParams;
 //        Yii::$app->utility->debug($queryParams);
-                
+        if($q!='') Yii::$app->session->set("lastTimeSearch", date('d/m/Y H:i:s'));       
         return $this->renderPartial('/search/search_content', [
                     'dataProvider' => $dataProvider,
                     'setting' => $setting,
@@ -98,6 +100,7 @@ class SearchController extends Controller {
         else{
             $searchModel = new \app\models\AlbumSearch();
             $dataProvider = $searchModel->search($params);
+            if($q!='') Yii::$app->session->set("lastTimeSearch", date('d/m/Y H:i:s'));
             return $this->render('/search/main_album', [
                     'dataProvider' => $dataProvider,
                     'setting' => Settings::getSetting(),
@@ -144,15 +147,23 @@ class SearchController extends Controller {
                 $lastword = $words[0];
                 $oneWordFlag = 1;
             }
-            //ตัวอักษร/คำ ขึ้นต้น
-            $result1 = Dictionary::find()->where(["LIKE", "word", $lastword . "%", false])->select("word")->limit(10)->asArray()->all();
-            $result2_limit = max(0,10-count($result1));
+            //Words in media files ขึ้นต้น
+            $resultMediaWord1 = MediaWord::find()->where(["LIKE", "word", $lastword . "%", false])->select("word")->limit(10)->asArray()->all();
+            $wordsRemaining = max(0, 10-count($resultMediaWord1));
+            //ตำแหน่งไหนก็ได้
+            $resultMediaWord2 = $wordsRemaining <= 0 ? [] :Mediaword::find()->where(["LIKE", "word", $lastword])->andWhere(["NOT IN", "word", $resultMediaWord1])->select("word")->limit($wordsRemaining)->asArray()->all();
+            $mediaWordsMerged = array_merge($resultMediaWord1, $resultMediaWord2);
+            unset($resultMediaWord1);unset($resultMediaWord2);//memory optimize
+            $wordsRemaining = max(0, $wordsRemaining-count($mediaWordsMerged));
+            //Words in dictionary ตัวอักษร/คำ ขึ้นต้น
+            $result1 = $wordsRemaining <= 0 ? [] : Dictionary::find()->where(["LIKE", "word", $lastword . "%", false])->select("word")->limit($wordsRemaining)->asArray()->all();
+            $wordsRemaining = max(0,$wordsRemaining-count($result1));
             //ตัวอักษร/คำ อยู่ตรงในก็ได้
-            $result2 = [];
-            if($result2_limit > 0)
-                $result2 = Dictionary::find()->where(["LIKE", "word", $lastword])->andWhere(["NOT IN", "word", $result1])->select("word")->limit($result2_limit)->asArray()->all();
+            $result2 = $wordsRemaining <= 0 ? [] : Dictionary::find()->where(["LIKE", "word", $lastword])->andWhere(["NOT IN", "word", $result1])->select("word")->limit($wordsRemaining)->asArray()->all();
             //merge arrays
             $merged = array_merge($result1, $result2);
+            $merged = array_merge($mediaWordsMerged, $merged);
+            unset($mediaWordsMerged);//memory optimize
             //2Dim to 1Dim Convert
             $oneDim = array_map('current', $merged);
             $previousWord = "";

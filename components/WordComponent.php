@@ -8,6 +8,7 @@ use app\models\Settings;
 use app\models\FrequencyWord;
 use app\models\Dictionary;
 use app\models\FrequencyRelation;
+use yii\web\Session;
 
 class WordComponent extends Component
 {
@@ -38,6 +39,12 @@ class WordComponent extends Component
 //    }
     public function updateRelationWord($splited_q, $splited_oq = []){
         if(!$splited_oq) $splited_oq = [];
+        /* detect search within 5 minutes.*/
+        $lastTimeUpdate = Yii::$app->session->get("lastTimeSearch");
+        if($lastTimeUpdate == null) return true;
+        $diffTime = date_diff(date_create(),date_create_from_format('d/m/Y H:i:s',$lastTimeUpdate))->format('%i');
+        if($diffTime > 5) return true;
+
         $i = 0;
         foreach($splited_q as $kq => $vq){
             $i=$kq+1;
@@ -55,6 +62,7 @@ class WordComponent extends Component
                 }
                 
             }
+
             foreach($splited_oq as $koq => $voq){
                 $cross_relation = FrequencyRelation::findByWords($vq, $voq);
                 if(!$cross_relation){

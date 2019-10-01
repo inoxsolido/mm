@@ -1,5 +1,5 @@
 <?php
-    $host = "mm.test";
+    $host = "127.0.0.1/mm";
     $resource = "/cron/clean-media-word";
 
     $url = $host.$resource;
@@ -10,8 +10,8 @@
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
     $response = curl_exec($ch);
     if($response){
-        echo "SUCCESS";
+        echo date('d/M/Y H:i:s')." SUCCESS \r\n";
     }else{
-        echo "ERROR";
+        echo date('d/M/Y H:i:s')." ERROR \r\n";
     }
 ?>
