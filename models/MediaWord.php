@@ -77,8 +77,12 @@ class MediaWord extends \yii\db\ActiveRecord
         if(count($strTags) == 0) return true;
         
         $tags = explode(",", $strTags);
-        
-        $queryBuilder = Yii::$app->db->createCommand()->batchInsert(MediaWord::tableName(), ['word'], $tags)->getRawSql();
+        $rows = [];
+        foreach($tags as $tag){
+            $row = [$tag];
+            array_push($rows, $row);
+        }
+        $queryBuilder = Yii::$app->db->createCommand()->batchInsert(MediaWord::tableName(), ['word'], $rows)->getRawSql();
         $queryBuilder = Yii::$app->db->createCommand(str_replace("INSERT", "INSERT IGNORE", $queryBuilder));
         try{
             $queryBuilder->execute();
