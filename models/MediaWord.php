@@ -84,7 +84,7 @@ class MediaWord extends \yii\db\ActiveRecord
             $queryBuilder->execute();
             return true;
         }catch(\Exception $e){
-            echo $e->getMessage();
+            print_r($e);
             return false;
         }
     }
