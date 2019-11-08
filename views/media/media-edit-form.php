@@ -163,7 +163,7 @@ $setting = \app\models\Settings::getSetting();
                 var percentVal = '100%';
                 bar.width(percentVal);
                 percent.html(percentVal);
-//                window.location = responseText;
+                window.location = responseText;
                 console.log(responseText);
             },
             error: function(xhr){

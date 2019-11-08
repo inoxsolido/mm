@@ -33,12 +33,6 @@ class RelationController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index'],
-                        'roles' => ['@']
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['create', 'update', 'delete'],
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->identity->getIsAdmin();

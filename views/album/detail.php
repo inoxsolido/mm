@@ -9,6 +9,7 @@ use richardfan\widget\JSRegister;
 use yii\helpers\Url;
 use app\models\Media;
 
+\app\assets\PlyrAsset::register($this);
 $mediaModel = $mediaDataProvider->getModels();
 $this->title = $album->name;
 $this->params['breadcrumbs'][] = ['label' => 'Album', 'url' => ['index']];
@@ -55,7 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
         <div class="thumbnail">
             <div class="thumbnail-img">
-            <a href="#"><img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" alt=""/></a>
+            <a href="#<?=$model['id']?>" onclick='return $(".previewable[data-id=<?=$model["id"]?>]").click()'>
+                <img src="<?='http://'.$setting->ftp_host.$setting->http_part.'/'.$model['file_thumbnail_path']?>" alt=""/>
+            </a>
             </div>
             <div class="caption">
                 <h4><a class="previewable title" title="<?=$model['name']?>" data-id="<?=$model['id']?>" data-name="<?= $model['name'] ?>" 

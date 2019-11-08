@@ -12,7 +12,7 @@ use richardfan\widget\JSRegister;
 
 $title = $album ? $album->name : "ไม่มีชื่อ";
 $this->title = "แก้ไขอัลบั้ม $title";
-$this->params['breadcrumbs'][] = ['label' => $title, 'url' => $album ? ['album', 'id' => $album->id] : '#'];
+$this->params['breadcrumbs'][] = ['label' => $title, 'url' => $album ? Url::toRoute(['album/index', 'AlbumSearch[name]' => $album->name]) : '#'];
 $this->params['breadcrumbs'][] = 'แก้ไขอัลบั้ม';
 ?>
 <style>

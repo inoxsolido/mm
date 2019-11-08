@@ -27,22 +27,11 @@ class MediaTypeController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index'],
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->identity->getIsAdmin();
                         }
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['update'],
-                        'roles' => ['@'],
-                        'matchCallback' => function($rule, $action){
-                            if(Yii::$app->user->identity->getIsAdmin()) return true;
-                            if(Yii::$app->request->get('id') != Yii::$app->user->getId()) return false;
-                            return true;
-                        }
-                    ],
+                    ],  
                             
                 ],
             ]

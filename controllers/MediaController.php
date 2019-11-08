@@ -79,7 +79,7 @@ class MediaController extends Controller
 
     public function actionMediaEdit($id) {
         //Set default $media->id
-        if ($id === '')
+        if ($id == '')
             $id = Yii::$app->request->get("id");
         //if still missing, return home
         if ($id === '')
@@ -146,7 +146,7 @@ class MediaController extends Controller
                 return $ex->getMessage();
             }
 
-            return Url::to("media/detail",['id'=>$id]);
+            return Url::toRoute(["media/index"]);
         } else { //GET request
             $albumList = Album::find()->all();
             $albumList = \yii\helpers\ArrayHelper::map($albumList, 'id', 'name');

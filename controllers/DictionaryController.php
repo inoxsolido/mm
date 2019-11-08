@@ -33,11 +33,6 @@ class DictionaryController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index'],
-                        'roles' => ['@']
-                    ],
-                    [
-                        'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->identity->getIsAdmin();
