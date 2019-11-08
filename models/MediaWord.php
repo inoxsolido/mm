@@ -74,9 +74,9 @@ class MediaWord extends \yii\db\ActiveRecord
      * @param String $strTags
      */
     public static function createMediaWordByTags($strTags){
-        if(count($tags) == 0) return true;
+        if(count($strTags) == 0) return true;
         
-        $tags = explode(",", $tags);
+        $tags = explode(",", $strTags);
         
         $queryBuilder = Yii::$app->db->createCommand()->batchInsert(MediaWord::tableName(), ['word'], $rows)->getRawSql();
         $queryBuilder = Yii::$app->db->createCommand(str_replace("INSERT", "INSERT IGNORE", $queryBuilder));
