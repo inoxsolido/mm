@@ -85,6 +85,7 @@ class MediaWord extends \yii\db\ActiveRecord
             return true;
         }catch(\Exception $e){
             print_r($e);
+            print_r($tags);
             return false;
         }
     }
