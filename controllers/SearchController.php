@@ -96,16 +96,13 @@ class SearchController extends Controller {
     public function actionAlbum(){
         $params = Yii::$app->request->post();
         $q = Yii::$app->request->get('q');
-        if(Yii::$app->request->isAjax){return 'ajaxajx';}
-        else{
-            $searchModel = new \app\models\AlbumSearch();
-            $dataProvider = $searchModel->search($params);
-            if($q!='') Yii::$app->session->set("lastTimeSearch", date('d/m/Y H:i:s'));
-            return $this->render('/search/main_album', [
-                    'dataProvider' => $dataProvider,
-                    'setting' => Settings::getSetting(),
-            ]);
-        }
+        $searchModel = new \app\models\AlbumSearch();
+        $dataProvider = $searchModel->search($params);
+        if($q!='') Yii::$app->session->set("lastTimeSearch", date('d/m/Y H:i:s'));
+        return $this->render('/search/main_album', [
+                'dataProvider' => $dataProvider,
+                'setting' => Settings::getSetting(),
+        ]);
     }
     /**
      * Display file in ftp-server by fetching file list from ftp

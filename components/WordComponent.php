@@ -42,7 +42,7 @@ class WordComponent extends Component
         /* detect search within 5 minutes.*/
         $lastTimeUpdate = Yii::$app->session->get("lastTimeSearch");
         if($lastTimeUpdate == null) return true;
-        $diffTime = date_diff(date_create(),date_create_from_format('d/m/Y H:i:s',$lastTimeUpdate))->format('%i');
+        $diffTime = date_diff(date_create(), date_create_from_format('d/m/Y H:i:s',$lastTimeUpdate))->format('%i');
         if($diffTime > 5) return true;
 
         $i = 0;
@@ -125,7 +125,6 @@ class WordComponent extends Component
             return $wordModel->delete();
         }
         return false; //reject if fail on updating counter
-        
     }
 
     /**
