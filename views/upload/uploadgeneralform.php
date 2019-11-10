@@ -68,7 +68,7 @@ use yii\helpers\Url;
                 //'maxFileSize'=>2800
 
             ],
-            'options' => ['accept' => 'image/*', 'multiple' => false]
+            'options' => ['accept' => 'image/*', 'multiple' => false, 'require' => true]
         ]) ?>
     <button id="btnusethumbnail" type="button" title="Use thumbnail from video" class="btn btn-default" style="display:none">
         <i class="glyphicon glyphicon-ban-circle"></i> ใช้ภาพตัวอย่างจากวิดีโอ
