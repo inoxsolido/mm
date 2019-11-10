@@ -48,4 +48,15 @@ class CronController extends Controller
             echo "Exception Error: ".$e->getMessage();
         }
     }
+
+    public function actionInitiateMediaWord(){
+        $Albums = \app\models\Album::find()->all();
+        foreach($Albums as $a){
+            $a->save(false);
+        }
+        $Medias = \app\models\Media::find()->all();
+        foreach($Medias as $m){
+            $m->save(false);
+        }
+    }
 }
