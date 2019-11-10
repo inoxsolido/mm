@@ -108,7 +108,7 @@ class WordController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $word = $model->word1;
+        $word = $model->word;
         if($model->delete()){
             Yii::$app->session->setFlash('success', "$word was deleted");
         }else{
