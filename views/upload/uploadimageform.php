@@ -72,6 +72,7 @@ Use exist album
                 'showCaption' => true,
                 'showRemove' => false,
                 'showUpload' => false,
+                'dropZoneEnabled' => false,
                 'browseClass' => 'btn btn-primary ',
                 'browseIcon' => '<i class="glyphicon glyphicon-camera"></i> ',
                 'browseLabel' => 'เลือกไฟล์',
