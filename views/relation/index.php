@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\FrequencyRelationSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Frequency Relations';
+$this->title = 'Related Word';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="frequency-relation-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Frequency Relation', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Related Word', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 <?php Pjax::begin(); ?>    <?= GridView::widget([
         'dataProvider' => $dataProvider,

@@ -13,7 +13,7 @@
                     ['label' => 'Media', 'icon' => 'film', 'url' => ['media/index']],
                     ['label' => 'Album', 'icon' => 'folder-o', 'url' => ['album/index']],
                     ['label' => 'Media Type Extension', 'icon'=> 'filter', 'url' => ['media-type/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
-                    ['label' => 'Related Words', 'icon' => 'th-list', 'url' => ['relation/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
+                    ['label' => 'Related Word', 'icon' => 'th-list', 'url' => ['relation/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
                     ['label' => 'Frequency Words', 'icon' => 'list-ol', 'url' => ['word/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
                     ['label' => 'Dictionary', 'icon' => 'align-left', 'url' => ['dictionary/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
                     ['label' => 'User', 'icon' => 'users', 'url' => ['user/index'], 'visible'=>Yii::$app->user->identity != NULL && Yii::$app->user->identity->getIsAdmin()],
