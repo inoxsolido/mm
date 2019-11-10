@@ -104,7 +104,7 @@ Use exist album
 <script>
 $(function(){
     tagbox.tagbox(".tagbox");
-    
+    var upload_state_done = 0;
     $("body").on('click', '.close', function(){
         $("#album-files").val('').change();
     });
@@ -115,7 +115,7 @@ $(function(){
         //add new data;
         addThumbnailToForm();
         $(window).on("beforeunload", function(){
-            return "Bye";
+            return upload_state_done?undefined:true;
         });
     });
     function addThumbnailToForm(){
@@ -250,6 +250,7 @@ $(function(){
             bar.width(percentVal);
             percent.html(percentVal);
             successPopUp("Upload Successful");
+            upload_state_done = 1;
             window.location = responseText;
         },
         error: function (xhr) {
