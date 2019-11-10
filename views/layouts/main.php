@@ -8,6 +8,7 @@ app\assets\AppAsset::register($this);
 
 
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
+$this->title?'':'Media Management System';
 ?>
 <?php $this->beginPage()?>
 <!DOCTYPE html>
