@@ -97,7 +97,7 @@ class MediaWord extends \yii\db\ActiveRecord
     /**
      * isMediaWord
      * Use to Check $word that related to media
-     * @param String $word
+     * @param mixed $word 
      * @return boolean return true if $word related to media else return false
      */
     public static function isMediaWord($word){

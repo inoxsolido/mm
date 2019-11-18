@@ -8,6 +8,7 @@ use app\models\Settings;
 use app\models\FrequencyWord;
 use app\models\Dictionary;
 use app\models\FrequencyRelation;
+use app\models\MediaWord;
 use yii\web\Session;
 
 class WordComponent extends Component
@@ -44,6 +45,8 @@ class WordComponent extends Component
         if($lastTimeUpdate == null) return true;
         $diffTime = date_diff(date_create(), date_create_from_format('d/m/Y H:i:s',$lastTimeUpdate))->format('%i');
         if($diffTime > 5) return true;
+        //Is one that contain media word 
+        if( !(MediaWord::isMediaWord($splited_q) || MediaWord::isMediaWord($splited_oq)) ) return true;
 
         $i = 0;
         foreach($splited_q as $kq => $vq){
