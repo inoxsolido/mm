@@ -55,6 +55,8 @@ class AlbumSearch extends Album
                 $params['oq'] = trim($params['oq']);
                 $params['oq'] = preg_replace('/[~!@#$%^&*()_+\/\-*\/\.,\?\[\]\|:;"\'\\\\<>\{\}]/', '', $params['oq']);
                 $splited_oq = Yii::$app->word->split($params['oq']);
+                if(!in_array(@$params['q'], $splited_q)) array_push($splited_q,$params['q']);
+                if(!in_array(@$params['oq'], $splited_oq)) array_push($splited_oq, $params['oq']);
                 Yii::$app->word->updateRelationWord($splited_q, $splited_oq);
             }
             $query1 = clone $draftQuery; //1. มีคำครบทุกคำและไม่มีคำอื่นแทรกระหว่างประโยค
