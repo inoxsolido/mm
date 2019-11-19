@@ -71,9 +71,11 @@ class FrequencyRelation extends \yii\db\ActiveRecord
         if($setting == '') $setting = Settings::getSetting();
         $freg_relation_rate = $setting->frequency_relation_rate;
         $related_word = [];
-        $sql = "SELECT word1 as word,frequency FROM frequency_relation WHERE word2 LIKE '%$query%' AND frequency >= $freg_relation_rate \n"
+        $splited_query = Yii::$app->word->split($query);
+        $pattern = '^.*' . join('.*', $splited_query) . '.*$';
+        $sql = "SELECT word1 as word,frequency FROM frequency_relation WHERE word2 REGEXP '$pattern' AND frequency >= $freg_relation_rate \n"
                 . "UNION \n"
-                . "SELECT word2 as word,frequency FROM frequency_relation WHERE word1 LIKE '%$query%' AND frequency >= $freg_relation_rate \n"
+                . "SELECT word2 as word,frequency FROM frequency_relation WHERE word1 REGEXP '$pattern' AND frequency >= $freg_relation_rate \n"
                 . "ORDER BY frequency DESC";
         $related_word = Yii::$app->db->createCommand($sql)->queryColumn('word');
         return $related_word;

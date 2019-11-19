@@ -116,6 +116,8 @@ class MediaSearch extends Media {
                 $condition_3
             );
         }
+            
+        $condition_4 = ['or'];
         
 
         if(@$params['omedianame']){
@@ -142,7 +144,7 @@ class MediaSearch extends Media {
         );
         
         $final_query = $query1->union($query2)->union($query3);
-        $condition_4 = [];
+        
         //query4
         $related_word = FrequencyRelation::getRelatedWord($params['q']);
         if (!empty($related_word)){
@@ -161,12 +163,13 @@ class MediaSearch extends Media {
                 array_push($condition_4, ['REGEXP', 'album.tags', $pattern2]);
             }
             
-            $query4->andWhere($condition_4);
+            $query4->andWhere(['or',
+                $condition_4
+            ]);
             $final_query->union($query4);
         }
         
         $final_sql = $final_query->createCommand()->getRawSql();
-        Yii::$app->utility->debug($final_sql);
         $count = $final_query->count();
         $dataProvider = new SqlDataProvider([
             'sql' => $final_sql,
