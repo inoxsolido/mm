@@ -31,9 +31,7 @@ class Dictionary extends \yii\db\ActiveRecord
             [['word'], 'required'],
             [['length'], 'integer'],
             [['word'], 'string', 'max' => 60, 'on'=>'single'],
-            [['word'], 'unique', 'message' => '{attribute} {value} มีอยู่แล้วในระบบ'],
-            [['media_tag'], 'boolean'],
-            [['media_tag'], 'default', 'value' => 0]
+            [['word'], 'unique', 'message' => '{attribute} {value} มีอยู่แล้วในระบบ']
         ];
     }
 
