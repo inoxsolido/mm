@@ -163,9 +163,7 @@ class MediaSearch extends Media {
                 array_push($condition_4, ['REGEXP', 'album.tags', $pattern2]);
             }
             
-            $query4->orWhere(['or',
-                $condition_4
-            ]);
+            $query4->andWhere($condition_4);
             $final_query->union($query4);
         }
         
