@@ -102,8 +102,12 @@ class MediaWord extends \yii\db\ActiveRecord
      */
     public static function isMediaWord($word){
         $condition = ['or'];
-        foreach($word as $w){
-            array_push($condition, ['LIKE', 'word', $w]);
+        if(is_array($word)){
+            foreach($word as $w){
+                array_push($condition, ['LIKE', 'word', $w]);
+            }
+        }else{
+            $condition = ['LIKE', 'word', $word];
         }
         return MediaWord::find()->where($condition)->exists();
     }
