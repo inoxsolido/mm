@@ -116,8 +116,6 @@ class MediaSearch extends Media {
                 $condition_3
             );
         }
-            
-        $condition_4 = ['or'];
         
 
         if(@$params['omedianame']){
@@ -144,7 +142,7 @@ class MediaSearch extends Media {
         );
         
         $final_query = $query1->union($query2)->union($query3);
-        
+        $condition_4 = [];
         //query4
         $related_word = FrequencyRelation::getRelatedWord($params['q']);
         if (!empty($related_word)){
