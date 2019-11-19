@@ -101,6 +101,10 @@ class MediaWord extends \yii\db\ActiveRecord
      * @return boolean return true if $word related to media else return false
      */
     public static function isMediaWord($word){
-        return MediaWord::find()->where(['word'=>$word])->exists();
+        $condition = ['or'];
+        foreach($word as $w){
+            array_push($condition, ['LIKE', 'word', $w]);
+        }
+        return MediaWord::find()->where($condition)->exists();
     }
 }
