@@ -168,6 +168,7 @@ class MediaSearch extends Media {
         }
         
         $final_sql = $final_query->createCommand()->getRawSql();
+        Yii::$app->utility->debug($final_sql);
         $count = $final_query->count();
         $dataProvider = new SqlDataProvider([
             'sql' => $final_sql,
